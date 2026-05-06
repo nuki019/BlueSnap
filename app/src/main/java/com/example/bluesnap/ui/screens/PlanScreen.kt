@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.screens
+package com.example.bluesnap.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -14,9 +14,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.example.mycreate.data.AppPlan
-import com.example.mycreate.ui.components.PlanCard
-import com.example.mycreate.ui.theme.BluePrimary
+import com.example.bluesnap.data.AppPlan
+import com.example.bluesnap.ui.components.PlanCard
+import com.example.bluesnap.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.components
+package com.example.bluesnap.ui.components
 
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
@@ -19,7 +19,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mycreate.ui.theme.AiBubble
+import com.example.bluesnap.ui.theme.AiBubble
 
 /**
  * 流式输出中的 AI 气泡，带有动画省略号指示正在生成。
@@ -53,7 +53,7 @@ fun StreamingBubble(
         ) {
             // 角色标签
             Text(
-                text = "蓝心快搭",
+                text = "BlueSnap",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)

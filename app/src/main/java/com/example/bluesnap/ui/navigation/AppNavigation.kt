@@ -1,12 +1,12 @@
-package com.example.mycreate.ui.navigation
+package com.example.bluesnap.ui.navigation
 
 import androidx.compose.animation.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import com.example.mycreate.data.Screen
-import com.example.mycreate.ui.screens.*
-import com.example.mycreate.viewmodel.MainViewModel
+import com.example.bluesnap.data.Screen
+import com.example.bluesnap.ui.screens.*
+import com.example.bluesnap.viewmodel.MainViewModel
 
 @Composable
 fun AppNavigation(viewModel: MainViewModel) {

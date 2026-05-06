@@ -1,4 +1,4 @@
-package com.example.mycreate.data
+package com.example.bluesnap.data
 
 import java.util.UUID
 

@@ -1,4 +1,4 @@
-# 蓝心快搭 BlueKuaiDa
+# BlueSnap
 
 > 将创作的自由还给每个人 —— 用自然语言描述需求，AI 一键生成可运行的轻量应用
 
@@ -6,7 +6,7 @@
 
 ## 项目简介
 
-蓝心快搭是一个 Android 应用，用户通过自然语言描述想要的工具，AI 自动生成完整的单页 HTML 应用并在 WebView 沙箱中实时预览。无需编程知识，无需安装额外应用，即说即用。
+BlueSnap是一个 Android 应用，用户通过自然语言描述想要的工具，AI 自动生成完整的单页 HTML 应用并在 WebView 沙箱中实时预览。无需编程知识，无需安装额外应用，即说即用。
 
 **核心能力：**
 - 自然语言理解：支持中文描述需求，AI 自动解析意图
@@ -31,8 +31,8 @@
 ### 1. 克隆项目
 
 ```bash
-git clone https://github.com/nmsl-ai/MyCreate.git
-cd MyCreate
+git clone https://github.com/nmsl-ai/BlueSnap.git
+cd BlueSnap
 ```
 
 ### 2. 配置 API Key
@@ -59,7 +59,7 @@ ai.model=Doubao-Seed-2.0-pro
 ## 项目结构
 
 ```
-app/src/main/java/com/example/mycreate/
+app/src/main/java/com/example/bluesnap/
 ├── MainActivity.kt                 # 入口
 ├── data/
 │   └── Models.kt                   # 数据模型 (ChatMessage, AppPlan, AppState)

@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.screens
+package com.example.bluesnap.ui.screens
 
 import androidx.compose.animation.*
 import androidx.compose.foundation.background
@@ -21,11 +21,11 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mycreate.ui.components.TemplateChip
-import com.example.mycreate.ui.components.defaultTemplates
-import com.example.mycreate.ui.theme.BluePrimary
-import com.example.mycreate.ui.theme.BluePrimaryDark
-import com.example.mycreate.ui.theme.BluePrimaryLight
+import com.example.bluesnap.ui.components.TemplateChip
+import com.example.bluesnap.ui.components.defaultTemplates
+import com.example.bluesnap.ui.theme.BluePrimary
+import com.example.bluesnap.ui.theme.BluePrimaryDark
+import com.example.bluesnap.ui.theme.BluePrimaryLight
 
 @Composable
 fun HomeScreen(
@@ -68,7 +68,7 @@ fun HomeScreen(
         ) {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
-                    text = "蓝心快搭",
+                    text = "BlueSnap",
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         letterSpacing = 4.sp

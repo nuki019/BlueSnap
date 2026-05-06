@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.screens
+package com.example.bluesnap.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -19,11 +19,11 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import com.example.mycreate.data.ChatMessage
-import com.example.mycreate.data.Role
-import com.example.mycreate.ui.components.MessageBubble
-import com.example.mycreate.ui.components.StreamingBubble
-import com.example.mycreate.ui.theme.BluePrimary
+import com.example.bluesnap.data.ChatMessage
+import com.example.bluesnap.data.Role
+import com.example.bluesnap.ui.components.MessageBubble
+import com.example.bluesnap.ui.components.StreamingBubble
+import com.example.bluesnap.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -76,7 +76,7 @@ fun ChatScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("蓝心快搭", style = MaterialTheme.typography.titleMedium)
+                        Text("BlueSnap", style = MaterialTheme.typography.titleMedium)
                         Text(
                             "AI 应用生成助手",
                             style = MaterialTheme.typography.bodySmall,
@@ -134,7 +134,7 @@ fun ChatScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "蓝心快搭正在构思中...",
+                                text = "BlueSnap正在构思中...",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = BluePrimary.copy(alpha = 0.7f)
                             )

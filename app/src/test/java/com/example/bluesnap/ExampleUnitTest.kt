@@ -1,4 +1,4 @@
-package com.example.mycreate
+package com.example.bluesnap
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.screens
+package com.example.bluesnap.ui.screens
 
 import android.annotation.SuppressLint
 import android.util.Log
@@ -23,8 +23,8 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
-import com.example.mycreate.data.GeneratedApp
-import com.example.mycreate.ui.theme.BluePrimary
+import com.example.bluesnap.data.GeneratedApp
+import com.example.bluesnap.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable

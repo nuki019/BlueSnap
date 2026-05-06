@@ -1,8 +1,8 @@
-package com.example.mycreate.ai
+package com.example.bluesnap.ai
 
 import android.util.Log
-import com.example.mycreate.BuildConfig
-import com.example.mycreate.data.*
+import com.example.bluesnap.BuildConfig
+import com.example.bluesnap.data.*
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
@@ -312,7 +312,7 @@ class RealAiService : AiService {
     }
 
     companion object {
-        private const val CHAT_SYSTEM_PROMPT = """你是"蓝心快搭"AI 助手，一个帮助用户通过自然语言创建轻量级应用的智能工具。
+        private const val CHAT_SYSTEM_PROMPT = """你是"BlueSnap"AI 助手，一个帮助用户通过自然语言创建轻量级应用的智能工具。
 
 你的职责：
 1. 理解用户想要创建什么样的应用
@@ -325,7 +325,7 @@ class RealAiService : AiService {
 - 如果用户需求模糊，追问 1-2 个关键问题来明确需求
 - 不要直接生成代码，代码生成在后续步骤完成"""
 
-        private const val PLAN_SYSTEM_PROMPT = """你是"蓝心快搭"AI 助手。根据对话历史中用户描述的需求，生成一个应用设计方案。
+        private const val PLAN_SYSTEM_PROMPT = """你是"BlueSnap"AI 助手。根据对话历史中用户描述的需求，生成一个应用设计方案。
 
 你必须严格返回以下 JSON 格式，不要包含任何其他文字：
 {
@@ -345,7 +345,7 @@ class RealAiService : AiService {
 - 所有功能默认 enabled: true
 - 只返回 JSON，不要有其他内容"""
 
-        private const val HTML_SYSTEM_PROMPT = """你是"蓝心快搭"代码生成引擎。根据以下需求生成一个完整的单 HTML 文件应用。
+        private const val HTML_SYSTEM_PROMPT = """你是"BlueSnap"代码生成引擎。根据以下需求生成一个完整的单 HTML 文件应用。
 
 应用名称：{app_name}
 应用描述：{app_desc}
@@ -362,7 +362,7 @@ class RealAiService : AiService {
 6. 支持中文，字体使用 -apple-system, "PingFang SC", sans-serif
 7. JavaScript 功能完整可运行，无报错
 8. 不使用任何外部 CDN 或第三方库
-9. 颜色方案与蓝心快搭品牌一致（主色 #1A73E8）
+9. 颜色方案与BlueSnap品牌一致（主色 #1A73E8）
 10. 只返回 HTML 代码，不要有任何解释文字
 
 JavaScript 交互要求（极其重要）：

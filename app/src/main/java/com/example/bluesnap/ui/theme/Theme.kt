@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.theme
+package com.example.bluesnap.ui.theme
 
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -37,7 +37,7 @@ private val DarkColorScheme = darkColorScheme(
 )
 
 @Composable
-fun MyCreateTheme(
+fun BlueSnapTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
     dynamicColor: Boolean = false, // 关闭动态色，保持品牌一致
     content: @Composable () -> Unit

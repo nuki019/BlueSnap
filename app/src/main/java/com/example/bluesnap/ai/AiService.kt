@@ -1,7 +1,7 @@
-package com.example.mycreate.ai
+package com.example.bluesnap.ai
 
-import com.example.mycreate.data.AppPlan
-import com.example.mycreate.data.ChatMessage
+import com.example.bluesnap.data.AppPlan
+import com.example.bluesnap.data.ChatMessage
 import kotlinx.coroutines.flow.Flow
 
 interface AiService {

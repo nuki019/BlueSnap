@@ -12,7 +12,7 @@ val localProps = Properties().apply {
 }
 
 android {
-    namespace = "com.example.mycreate"
+    namespace = "com.example.bluesnap"
     compileSdk {
         version = release(36) {
             minorApiLevel = 1
@@ -20,7 +20,7 @@ android {
     }
 
     defaultConfig {
-        applicationId = "com.example.mycreate"
+        applicationId = "com.example.bluesnap"
         minSdk = 33
         targetSdk = 36
         versionCode = 1

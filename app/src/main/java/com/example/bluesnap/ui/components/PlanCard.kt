@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.components
+package com.example.bluesnap.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -13,10 +13,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mycreate.data.AppPlan
-import com.example.mycreate.ui.theme.BluePrimary
-import com.example.mycreate.ui.theme.BluePrimaryLight
-import com.example.mycreate.ui.theme.SuccessGreen
+import com.example.bluesnap.data.AppPlan
+import com.example.bluesnap.ui.theme.BluePrimary
+import com.example.bluesnap.ui.theme.BluePrimaryLight
+import com.example.bluesnap.ui.theme.SuccessGreen
 
 @Composable
 fun PlanCard(

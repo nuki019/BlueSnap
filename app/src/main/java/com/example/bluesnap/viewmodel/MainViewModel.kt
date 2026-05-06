@@ -1,11 +1,11 @@
-package com.example.mycreate.viewmodel
+package com.example.bluesnap.viewmodel
 
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.mycreate.ai.AiService
-import com.example.mycreate.ai.RealAiService
-import com.example.mycreate.data.*
+import com.example.bluesnap.ai.AiService
+import com.example.bluesnap.ai.RealAiService
+import com.example.bluesnap.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

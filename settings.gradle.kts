@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "MyCreate"
+rootProject.name = "BlueSnap"
 include(":app")

@@ -1,4 +1,4 @@
-package com.example.mycreate.ui.components
+package com.example.bluesnap.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -11,10 +11,10 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.example.mycreate.data.ChatMessage
-import com.example.mycreate.data.Role
-import com.example.mycreate.ui.theme.AiBubble
-import com.example.mycreate.ui.theme.UserBubble
+import com.example.bluesnap.data.ChatMessage
+import com.example.bluesnap.data.Role
+import com.example.bluesnap.ui.theme.AiBubble
+import com.example.bluesnap.ui.theme.UserBubble
 
 @Composable
 fun MessageBubble(
@@ -41,7 +41,7 @@ fun MessageBubble(
         ) {
             // 角色标签
             Text(
-                text = if (isUser) "你" else "蓝心快搭",
+                text = if (isUser) "你" else "BlueSnap",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(
