@@ -1,0 +1,1226 @@
+% ====================================================================
+% 编译方法：
+%   1. 确保已安装 TeX Live 或 MiKTeX（包含 xeCJK 包）
+%   2. 在命令行中执行：
+%      xelatex proposal.tex
+%      xelatex proposal.tex （运行两次生成目录）
+%   3. 或使用 LaTeX 编辑器（如 TeXstudio、Overleaf）直接编译
+%
+% 注意：如果编译时提示缺少字体，请安装以下字体之一：
+%   - SimSun（宋体）、SimHei（黑体）、KaiTi（楷体）
+%   - 或在导言区修改 \setCJKmainfont 为系统已有字体
+% ====================================================================
+
+\documentclass[a4paper,12pt]{ctexart}
+
+% ==================== 基础包 ====================
+\usepackage[margin=2.5cm,headheight=14pt]{geometry}  % 页边距
+\usepackage{xeCJK}  % 中文支持
+\usepackage{fontspec}  % 字体设置
+\usepackage{graphicx}  % 图片
+\usepackage{booktabs}  % 表格
+\usepackage{tabularx}  % 自适应表格
+\usepackage{longtable}  % 长表格
+\usepackage{multirow}  % 合并行
+\usepackage{enumitem}  % 列表
+\usepackage[table]{xcolor}  % 颜色（table选项启用cellcolor等表格颜色命令）
+\usepackage{hyperref}  % 超链接
+\usepackage{fancyhdr}  % 页眉页脚
+\usepackage{titlesec}  % 标题样式
+\usepackage{titletoc}  % 目录样式
+\usepackage{appendix}  % 附录
+\usepackage{tikz}  % 绘图
+\usepackage{float}  % 浮动体
+\usepackage{caption}  % 标题样式
+
+% ==================== 字体设置 ====================
+% 如果系统没有以下字体，请替换为已安装的中文字体
+\setCJKmainfont{SimSun}  % 宋体
+\setCJKsansfont{SimHei}  % 黑体
+\setCJKmonofont{FangSong}  % 仿宋
+
+% ==================== 颜色定义 ====================
+\definecolor{vivoblue}{RGB}{0,100,255}  % vivo蓝
+\definecolor{darkblue}{RGB}{0,50,150}  % 深蓝
+\definecolor{lightblue}{RGB}{230,240,255}  % 浅蓝背景
+\definecolor{accentgreen}{RGB}{0,180,100}  % 强调绿
+\definecolor{accentorange}{RGB}{255,150,0}  % 强调橙
+\definecolor{graytext}{RGB}{100,100,100}  % 灰色文字
+\definecolor{codebg}{RGB}{245,245,245}  % 代码背景
+
+% ==================== 超链接样式 ====================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=darkblue,
+    urlcolor=vivoblue,
+    citecolor=darkblue,
+    pdfborder={0 0 0}
+}
+
+% ==================== 页眉页脚 ====================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[L]{\small 蓝心快搭 - 竞赛策划案}
+\fancyhead[R]{\small 第三届中国高校计算机大赛-AIGC创新赛}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+\renewcommand{\footrulewidth}{0.2pt}
+
+% ==================== 标题样式 ====================
+\titleformat{\section}{\Large\bfseries\color{darkblue}}{\thesection}{1em}{}
+\titleformat{\subsection}{\large\bfseries\color{darkblue}}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalsize\bfseries\color{darkblue}}{\thesubsubsection}{1em}{}
+
+% ==================== 目录样式 ====================
+\titlecontents{section}[0pt]{\addvspace{2pt}\bfseries}{\contentslabel{2em}}{}{\titlerule*[0.5pc]{.}\contentspage}
+\titlecontents{subsection}[2em]{\addvspace{1pt}}{\contentslabel{2em}}{}{\titlerule*[0.5pc]{.}\contentspage}
+
+% ==================== 自定义命令 ====================
+\newcommand{\highlight}[1]{\textcolor{vivoblue}{\textbf{#1}}}
+\newcommand{\important}[1]{\textcolor{red}{\textbf{#1}}}
+\newcommand{\note}[1]{\textcolor{graytext}{\textit{#1}}}
+
+% 创建信息框
+\newcommand{\infobox}[2]{
+    \begin{tikzpicture}
+        \node[draw=vivoblue, fill=lightblue, rounded corners, text width=\linewidth-2em, inner sep=1em] {
+            \textbf{#1:} #2
+        };
+    \end{tikzpicture}
+}
+
+% ==================== 文档信息 ====================
+\title{
+    \vspace{2cm}
+    {\Huge\bfseries\color{darkblue} 蓝心快搭} \\[0.5cm]
+    {\LARGE\color{vivoblue} 将创作的自由还给每个人} \\[2cm]
+    {\Large 竞赛策划案} \\[1cm]
+    {\large 第三届(2026)中国高校计算机大赛-AIGC创新赛} \\[0.5cm]
+    {\large 应用赛道}
+}
+\author{
+    \vspace{2cm}
+    {\large\textbf{参赛团队：}}[你的团队名称] \\[0.5cm]
+    {\large\textbf{指导教师：}}[指导教师姓名] \\[0.5cm]
+    {\large\textbf{参赛院校：}}[院校名称] \\[0.5cm]
+    {\large\textbf{联系电话：}}[联系电话] \\[0.5cm]
+    {\large\textbf{电子邮箱：}}[邮箱地址]
+}
+\date{\today}
+
+\begin{document}
+
+% ==================== 封面 ====================
+\begin{titlepage}
+    \centering
+    \vspace*{1cm}
+
+    % 顶部logo区域（可替换为实际logo）
+    \begin{tikzpicture}
+        \node[draw=vivoblue, fill=vivoblue, rounded corners, minimum width=8cm, minimum height=2cm, text=white, font=\Huge\bfseries] {蓝心快搭};
+    \end{tikzpicture}
+
+    \vspace{1cm}
+
+    {\LARGE\color{vivoblue} \textbf{将创作的自由还给每个人}} \\[2cm]
+
+    {\Huge\bfseries\color{darkblue} 竞赛策划案} \\[1.5cm]
+
+    {\Large 第三届(2026)中国高校计算机大赛-AIGC创新赛} \\[0.5cm]
+    {\Large 应用赛道 · 初赛方案}
+
+    \vspace{3cm}
+
+    % 参赛信息表格
+    \begin{tabular}{rl}
+        \textbf{参赛团队：} & [你的团队名称] \\
+        \textbf{指导教师：} & [指导教师姓名] \\
+        \textbf{参赛院校：} & [院校名称] \\
+        \textbf{项目名称：} & 蓝心快搭 \\
+        \textbf{提交日期：} & \today \\
+    \end{tabular}
+
+    \vfill
+    {\small 本文档为竞赛策划案，所有内容均为原创}
+\end{titlepage}
+
+% ==================== 目录 ====================
+\newpage
+\tableofcontents
+\thispagestyle{empty}
+\newpage
+
+% ==================== 正文开始 ====================
+\setcounter{page}{1}
+
+% ==================== 第一章：项目概述 ====================
+\section{项目概述}
+
+\subsection{项目名称}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{产品名称：}蓝心快搭
+    \item \textbf{英文名称：}LanXin QuickBuild
+    \item \textbf{产品标语：}将创作的自由还给每个人
+\end{itemize}
+
+\subsection{项目定位}
+
+蓝心快搭是一款基于vivo蓝心大模型的\highlight{AI驱动零代码移动端应用生成工具}。产品定位为：
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{面向普通用户：}无需编程知识，用自然语言即可创建实用的移动应用
+    \item \textbf{聚焦轻量化：}生成单HTML文件，在内置WebView沙箱中即时预览运行
+    \item \textbf{深度集成蓝心：}充分利用vivo蓝心大模型的AI能力，提供智能化的应用生成体验
+    \item \textbf{系统级融合：}与vivo OriginOS深度集成，提供原生级的用户体验
+\end{itemize}
+
+\subsection{核心价值主张}
+
+\begin{table}[H]
+    \centering
+    \caption{蓝心快搭核心价值主张}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{价值维度} & \textbf{具体描述} \\
+        \hline
+        \highlight{创作自由} & 打破技术壁垒，让每个人都能将创意变为可用的移动应用 \\
+        \hline
+        \highlight{即时满足} & 从想法到应用，分钟级交付，立即看到成果 \\
+        \hline
+        \highlight{零学习成本} & 自然语言交互，无需学习任何编程语言或开发工具 \\
+        \hline
+        \highlight{智能辅助} & AI理解需求、生成代码、优化体验，全程智能参与 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\infobox{项目愿景}{让每个人都能成为应用创造者，释放亿万普通用户的创造力，构建一个人人皆可参与的移动应用生态。}
+
+% ==================== 第二章：设计理念 ====================
+\section{设计理念}
+
+蓝心快搭的设计理念源于对移动应用开发现状的深刻思考和对用户需求的精准洞察：
+
+\subsection{对话即开发}
+
+\begin{quote}
+    \textit{``最好的交互方式，就是最自然的交互方式。''}
+\end{quote}
+
+传统应用开发需要经历需求分析、UI设计、编码、测试等多个专业环节。蓝心快搭将这一复杂过程简化为\highlight{自然语言对话}：
+
+\begin{itemize}[leftmargin=2em]
+    \item 用户用日常语言描述想要的应用功能
+    \item AI理解意图，自动生成技术方案
+    \item 用户确认后，一键生成可运行的应用
+\end{itemize}
+
+\subsection{创作自由}
+
+\begin{infobox}{设计理念}
+我们相信，创造力不应被技术门槛所限制。蓝心快搭让每个人都能：
+\begin{itemize}
+    \item 将脑海中的想法快速变为现实
+    \item 自主定制符合个人需求的工具
+    \item 无需依赖他人，独立完成应用创建
+\end{itemize}
+\end{infobox}
+
+\subsection{轻量化优先}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{单文件架构：}每个应用生成为一个独立的HTML文件，便于管理、分享和运行
+    \item \textbf{即时启动：}WebView沙箱秒级启动，无需等待漫长的编译和安装过程
+    \item \textbf{资源友好：}单文件体积小，不占用过多存储空间
+    \item \textbf{跨平台兼容：}HTML标准确保在不同设备上的一致表现
+\end{itemize}
+
+\subsection{渐进式能力}
+
+蓝心快搭采用\highlight{渐进式能力设计}，满足不同层次的用户需求：
+
+\begin{table}[H]
+    \centering
+    \caption{渐进式能力层次}
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+        \hline
+        \textbf{能力层次} & \textbf{目标用户} & \textbf{功能范围} \\
+        \hline
+        基础层 & 普通用户 & 通过自然语言生成标准应用，满足日常需求 \\
+        \hline
+        进阶层 & 高级用户 & 支持样式调整、功能组合、数据绑定等高级定制 \\
+        \hline
+        扩展层 & 开发者 & 提供代码导出、API接入、APK打包等扩展能力（远期） \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第三章：需求分析与痛点 ====================
+\section{需求分析与痛点}
+
+\subsection{市场痛点分析}
+
+\subsubsection{长尾需求真空}
+
+\begin{quote}
+    \textit{``80\%的用户需求，只被不到20\%的应用满足。''}
+\end{quote}
+
+移动应用市场存在严重的\important{长尾需求真空}：
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{个性化需求被忽视：}主流应用追求大众市场，个人化、场景化的小需求难以被满足
+    \item \textbf{需求响应滞后：}从需求提出到应用上线，传统开发周期长达数月
+    \item \textbf{创新想法流失：}大量有价值的创意因无法快速验证而被放弃
+\end{itemize}
+
+\subsubsection{开发门槛过高}
+
+\begin{table}[H]
+    \centering
+    \caption{传统应用开发门槛分析}
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+        \hline
+        \textbf{门槛类型} & \textbf{具体表现} & \textbf{影响} \\
+        \hline
+        技术门槛 & 需要掌握编程语言、框架、API等专业知识 & 95\%的普通用户被拒之门外 \\
+        \hline
+        工具门槛 & 需要配置开发环境、学习IDE、掌握调试技巧 & 学习成本高，上手困难 \\
+        \hline
+        时间门槛 & 一个简单应用也需要数天至数周开发 & 响应速度慢，错过时机 \\
+        \hline
+        资金门槛 & 需要服务器、域名、开发者账号等投入 & 个人开发者负担重 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{应用过载困境}
+
+用户手机中平均安装80+个应用，但\highlight{日常高频使用的不足10个}：
+
+\begin{itemize}[leftmargin=2em]
+    \item 应用功能过于臃肿，一个功能需要下载整个应用
+    \item 应用之间数据孤岛，无法自由组合功能
+    \item 存储空间被大量低频应用占用
+    \item 应用更新频繁，用户体验碎片化
+\end{itemize}
+
+\subsection{目标用户画像}
+
+\begin{table}[H]
+    \centering
+    \caption{目标用户群体分析}
+    \begin{tabularx}{\textwidth}{|l|l|X|X|}
+        \hline
+        \textbf{用户群体} & \textbf{占比} & \textbf{核心需求} & \textbf{典型场景} \\
+        \hline
+        \highlight{大学生} & 35\% & 学习工具、生活助手、创意表达 & 课程表生成、笔记整理、社团活动管理 \\
+        \hline
+        \highlight{职场人士} & 30\% & 效率工具、数据处理、团队协作 & 会议纪要、项目看板、报销计算器 \\
+        \hline
+        \highlight{小微商家} & 20\% & 经营工具、营销助手、客户管理 & 会员系统、促销活动页、库存查询 \\
+        \hline
+        \highlight{创意爱好者} & 15\% & 创意表达、个性化工具、实验探索 & 个人作品集、互动小游戏、数据可视化 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{需求优先级矩阵}
+
+\begin{table}[H]
+    \centering
+    \caption{需求优先级矩阵（初赛版本聚焦MVP）}
+    \begin{tabularx}{\textwidth}{|l|c|c|X|}
+        \hline
+        \textbf{需求} & \textbf{重要性} & \textbf{紧迫性} & \textbf{初赛范围} \\
+        \hline
+        自然语言输入 & 高 & 高 & \highlight{包含} - 核心功能 \\
+        \hline
+        AI方案生成 & 高 & 高 & \highlight{包含} - 核心功能 \\
+        \hline
+        单HTML生成 & 高 & 高 & \highlight{包含} - 核心功能 \\
+        \hline
+        WebView预览 & 高 & 高 & \highlight{包含} - 核心功能 \\
+        \hline
+        应用管理 & 中 & 中 & \highlight{包含} - 基础版本 \\
+        \hline
+        分享功能 & 中 & 低 & 部分包含 - 基础导出 \\
+        \hline
+        APK打包 & 中 & 低 & \note{远期展望} - 初赛后规划 \\
+        \hline
+        云端同步 & 低 & 低 & \note{远期展望} - 初赛后规划 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第四章：场景覆盖矩阵 ====================
+\section{场景覆盖矩阵}
+
+蓝心快搭围绕五大核心场景，覆盖用户日常高频需求：
+
+\subsection{场景一：移动办公}
+
+\begin{table}[H]
+    \centering
+    \caption{移动办公场景应用矩阵}
+    \begin{tabularx}{\textwidth}{|l|X|l|}
+        \hline
+        \textbf{应用类型} & \textbf{功能描述} & \textbf{蓝心能力} \\
+        \hline
+        会议纪要生成器 & 语音转文字，自动提取要点、待办事项 & 语音识别、文本摘要 \\
+        \hline
+        项目看板 & 可视化任务管理，拖拽排序，进度追踪 & 自然语言理解 \\
+        \hline
+        报销计算器 & 拍照识别发票，自动分类汇总 & OCR识别、数据提取 \\
+        \hline
+        日程管理 & 智能时间规划，冲突检测，提醒设置 & 时间理解、意图识别 \\
+        \hline
+        团队投票 & 快速创建投票，实时统计结果 & 文本理解 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{场景二：学习教育}
+
+\begin{table}[H]
+    \centering
+    \caption{学习教育场景应用矩阵}
+    \begin{tabularx}{\textwidth}{|l|X|l|}
+        \hline
+        \textbf{应用类型} & \textbf{功能描述} & \textbf{蓝心能力} \\
+        \hline
+        智能题库 & 错题收集、知识点分类、随机抽题练习 & 文本理解、知识图谱 \\
+        \hline
+        单词卡片 & 艾宾浩斯记忆曲线、发音朗读、自测模式 & 语音合成、记忆算法 \\
+        \hline
+        课程表 & 可视化周视图、教室导航、作业提醒 & 时间理解、位置服务 \\
+        \hline
+        学习统计 & 学习时长记录、专注度分析、进度可视化 & 数据分析 \\
+        \hline
+        论文助手 & 文献管理、笔记整理、参考文献生成 & 文本处理 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{场景三：出行生活}
+
+\begin{table}[H]
+    \centering
+    \caption{出行生活场景应用矩阵}
+    \begin{tabularx}{\textwidth}{|l|X|l|}
+        \hline
+        \textbf{应用类型} & \textbf{功能描述} & \textbf{蓝心能力} \\
+        \hline
+        旅行清单 & 目的地智能推荐、物品清单生成、行程规划 & 知识问答、文本生成 \\
+        \hline
+        记账本 & 语音记账、分类统计、消费趋势分析 & 语音识别、数据分析 \\
+        \hline
+        健康打卡 & 饮水/运动/睡眠记录、习惯养成、数据可视化 & 数据统计 \\
+        \hline
+        快递查询 & 单号识别、物流追踪、取件提醒 & OCR识别 \\
+        \hline
+        天气穿搭 & 天气预报、穿衣建议、出行提醒 & 天气API、文本生成 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{场景四：影像创作}
+
+\begin{table}[H]
+    \centering
+    \caption{影像创作场景应用矩阵}
+    \begin{tabularx}{\textwidth}{|l|X|l|}
+        \hline
+        \textbf{应用类型} & \textbf{功能描述} & \textbf{蓝心能力} \\
+        \hline
+        电子相册 & 照片瀑布流、主题分类、音乐相册生成 & 图像理解、内容分类 \\
+        \hline
+        证件照工具 & 智能抠图、背景替换、尺寸裁剪 & 图像分割、图像处理 \\
+        \hline
+        拼图海报 & 多图拼接、模板选择、文字添加 & 图像处理 \\
+        \hline
+        表情包制作 & 图片编辑、文字添加、动态生成 & 图像理解、创意生成 \\
+        \hline
+        作品集 & 摄影作品展示、分类管理、分享链接 & 图像分类 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{场景五：系统工具}
+
+\begin{table}[H]
+    \centering
+    \caption{系统工具场景应用矩阵}
+    \begin{tabularx}{\textwidth}{|l|X|l|}
+        \hline
+        \textbf{应用类型} & \textbf{功能描述} & \textbf{蓝心能力} \\
+        \hline
+        剪贴板管理 & 历史记录、分类收藏、快速粘贴 & 文本理解 \\
+        \hline
+        屏幕计时器 & 倒计时、正计时、多任务计时 & 系统能力 \\
+        \hline
+        随机决策器 & 抽签、转盘、骰子、自定义选项 & 随机算法 \\
+        \hline
+        密码生成器 & 自定义规则、强度检测、安全建议 & 安全算法 \\
+        \hline
+        单位换算 & 长度、重量、汇率、温度等多类型换算 & 计算能力 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{场景覆盖总结}
+
+\begin{table}[H]
+    \centering
+    \caption{五场景覆盖统计}
+    \begin{tabularx}{\textwidth}{|l|c|c|X|}
+        \hline
+        \textbf{场景} & \textbf{应用类型数} & \textbf{蓝心能力数} & \textbf{核心价值} \\
+        \hline
+        移动办公 & 5 & 4 & 提升工作效率，减少重复劳动 \\
+        \hline
+        学习教育 & 5 & 4 & 辅助学习，提高学习效率 \\
+        \hline
+        出行生活 & 5 & 4 & 简化生活，提升生活品质 \\
+        \hline
+        影像创作 & 5 & 4 & 释放创意，降低创作门槛 \\
+        \hline
+        系统工具 & 5 & 3 & 补充系统功能，满足个性化需求 \\
+        \hline
+        \textbf{总计} & \textbf{25+} & \textbf{19+} & \textbf{全面覆盖用户日常需求} \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第五章：核心功能设计 ====================
+\section{核心功能设计}
+
+蓝心快搭的核心功能围绕\highlight{``需求输入 → 方案生成 → 应用创建 → 预览运行 → 管理优化''}的完整闭环设计。
+
+\subsection{需求输入模块}
+
+\subsubsection{自然语言输入}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{文本输入：}支持用户自由输入文字描述需求
+    \item \textbf{语音输入：}集成蓝心语音识别，支持语音转文字输入
+    \item \textbf{智能提示：}提供场景化的需求模板和示例，降低输入门槛
+    \item \textbf{上下文理解：}支持多轮对话，逐步细化需求
+\end{itemize}
+
+\subsubsection{需求理解与澄清}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{意图识别：}蓝心大模型理解用户核心需求
+    \item \textbf{缺失信息补充：}AI主动询问关键信息，避免生成偏差
+    \item \textbf{需求拆解：}复杂需求自动拆解为多个功能点
+    \item \textbf{可行性评估：}实时评估需求的技术可行性和实现难度
+\end{itemize}
+
+\subsection{方案生成与确认模块}
+
+\subsubsection{智能方案生成}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{功能方案：}基于需求分析，生成应用功能清单
+    \item \textbf{UI方案：}自动生成界面布局和交互设计
+    \item \textbf{技术方案：}确定技术实现路径和所需蓝心能力
+    \item \textbf{预估信息：}显示预计生成时间、应用大小等信息
+\end{itemize}
+
+\subsubsection{方案确认与调整}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{方案预览：}以卡片或列表形式展示生成方案
+    \item \textbf{功能开关：}用户可选择性开启/关闭某些功能
+    \item \textbf{样式偏好：}提供颜色、布局等基础样式选择
+    \item \textbf{一键确认：}确认后立即开始生成应用
+\end{itemize}
+
+\subsection{一键HTML生成模块}
+
+\subsubsection{代码生成引擎}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{模板系统：}基于场景的高质量HTML模板库
+    \item \textbf{动态组装：}根据功能需求动态组装HTML、CSS、JavaScript
+    \item \textbf{蓝心API集成：}自动集成所需的蓝心AI能力调用代码
+    \item \textbf{响应式适配：}自动适配不同屏幕尺寸
+\end{itemize}
+
+\subsubsection{生成过程优化}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{流式输出：}实时显示生成进度，提升用户等待体验
+    \item \textbf{增量生成：}支持在已有应用基础上增量添加功能
+    \item \textbf{代码优化：}自动压缩和优化生成的代码，减小文件体积
+    \item \textbf{错误处理：}生成失败时提供详细错误信息和重试选项
+\end{itemize}
+
+\subsection{WebView沙箱预览模块}
+
+\subsubsection{安全沙箱环境}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{隔离运行：}应用在独立的WebView沙箱中运行，不影响系统
+    \item \textbf{权限控制：}严格控制应用可访问的系统资源和API
+    \item \textbf{安全审计：}对生成的代码进行安全检查，防止恶意行为
+    \item \textbf{资源限制：}限制应用的CPU、内存、网络等资源使用
+\end{itemize}
+
+\subsubsection{预览功能}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{即时预览：}生成完成后自动启动预览，秒级响应
+    \item \textbf{全屏模式：}支持全屏运行，获得沉浸式体验
+    \item \textbf{调试工具：}提供基础的调试功能，查看运行日志
+    \item \textbf{性能监控：}实时显示应用的性能指标（帧率、内存等）
+\end{itemize}
+
+\subsection{应用管理与分享模块}
+
+\subsubsection{应用管理}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{工具箱：}集中管理所有已创建的应用
+    \item \textbf{分类组织：}支持按场景、创建时间、使用频率等分类
+    \item \textbf{搜索功能：}快速查找已创建的应用
+    \item \textbf{批量操作：}支持批量删除、导出等操作
+\end{itemize}
+
+\subsubsection{分享功能}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{文件分享：}将HTML文件直接分享给他人
+    \item \textbf{链接分享：}生成分享链接，对方可在线预览（远期）
+    \item \textbf{社交分享：}分享到微信、QQ等社交平台
+    \item \textbf{二维码：}生成应用二维码，方便线下传播
+\end{itemize}
+
+\subsection{迭代优化模块}
+
+\subsubsection{用户反馈收集}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{使用统计：}记录应用使用频率、时长等数据
+    \item \textbf{反馈入口：}用户可对应用进行评价和建议
+    \item \textbf{问题报告：}一键报告应用问题，附带错误日志
+    \item \textbf{需求收集：}收集用户对新功能的需求
+\end{itemize}
+
+\subsubsection{智能优化}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{代码优化：}基于用户反馈，AI自动优化应用代码
+    \item \textbf{功能迭代：}用户可追加需求，AI增量更新应用
+    \item \textbf{性能优化：}自动检测和优化性能瓶颈
+    \item \textbf{兼容性修复：}自动修复在不同设备上的兼容性问题
+\end{itemize}
+
+% ==================== 第六章：技术架构 ====================
+\section{技术架构}
+
+\subsection{整体架构设计}
+
+蓝心快搭采用\highlight{端侧优先、端云协同}的技术架构，在保证体验的同时充分利用端侧AI能力。
+
+\begin{table}[H]
+    \centering
+    \caption{四层架构设计}
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+        \hline
+        \textbf{架构层次} & \textbf{技术组件} & \textbf{核心职责} \\
+        \hline
+        \highlight{交互层} & Android Native UI & 用户输入、方案展示、应用管理、预览界面 \\
+        \hline
+        \highlight{智能引擎层} & 蓝心大模型SDK & 需求理解、方案生成、代码生成、智能优化 \\
+        \hline
+        \highlight{系统能力层} & OriginOS API & 系统服务调用、资源管理、权限控制、安全沙箱 \\
+        \hline
+        \highlight{运行环境层} & WebView Engine & HTML渲染、JavaScript执行、应用生命周期管理 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{端云协同调度策略}
+
+\begin{table}[H]
+    \centering
+    \caption{端云协同调度策略表}
+    \begin{tabularx}{\textwidth}{|l|l|l|X|}
+        \hline
+        \textbf{任务类型} & \textbf{执行位置} & \textbf{触发条件} & \textbf{优势} \\
+        \hline
+        简单意图识别 & 端侧 & 基础指令、常用操作 & 低延迟、离线可用 \\
+        \hline
+        复杂需求理解 & 云端 & 复杂描述、多轮对话 & 理解能力强、上下文丰富 \\
+        \hline
+        代码模板匹配 & 端侧 & 标准场景、简单应用 & 快速响应、隐私保护 \\
+        \hline
+        代码生成与优化 & 云端 & 复杂逻辑、创新功能 & 生成质量高、功能丰富 \\
+        \hline
+        安全检查 & 端侧 & 生成完成时 & 本地检测、快速反馈 \\
+        \hline
+        性能优化 & 混合 & 运行时监控 & 实时优化、自适应调整 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{安全机制设计}
+
+\begin{table}[H]
+    \centering
+    \caption{安全机制体系}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{安全层面} & \textbf{具体措施} \\
+        \hline
+        \highlight{代码安全} & 生成代码静态分析、XSS/CSRF防护、恶意代码检测 \\
+        \hline
+        \highlight{运行安全} & WebView沙箱隔离、权限最小化原则、资源使用限制 \\
+        \hline
+        \highlight{数据安全} & 用户数据本地存储、敏感信息加密、隐私数据不上传 \\
+        \hline
+        \highlight{网络安全} & HTTPS通信、API密钥安全存储、请求签名验证 \\
+        \hline
+        \highlight{内容安全} & AI内容审核、敏感词过滤、合规性检查 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{技术选型}
+
+\begin{table}[H]
+    \centering
+    \caption{核心技术选型}
+    \begin{tabularx}{\textwidth}{|l|l|X|}
+        \hline
+        \textbf{技术领域} & \textbf{选型方案} & \textbf{选型理由} \\
+        \hline
+        开发语言 & Kotlin & Android官方推荐，与蓝心SDK兼容性好 \\
+        \hline
+        AI引擎 & vivo蓝心大模型SDK & 比赛要求，深度集成，端侧能力最强 \\
+        \hline
+        UI框架 & Jetpack Compose & 现代化UI开发，与原生系统融合度高 \\
+        \hline
+        网络层 & Retrofit + OkHttp & 成熟稳定，支持流式传输 \\
+        \hline
+        存储层 & Room + SharedPreferences & 结构化数据+轻量配置，满足不同存储需求 \\
+        \hline
+        WebView & Android System WebView & 系统原生支持，兼容性好，性能稳定 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第七章：原型设计 ====================
+\section{原型设计}
+
+蓝心快搭的原型设计围绕四个核心页面展开，打造流畅的用户体验闭环。
+
+\subsection{页面一：灵感输入页}
+
+\subsubsection{页面定位}
+用户表达创意的起点，提供自然、直观的输入体验。
+
+\subsubsection{核心元素}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{输入区域：}多行文本输入框，支持语音输入按钮
+    \item \textbf{智能提示：}底部滚动显示场景化的需求示例
+    \item \textbf{历史记录：}展示最近的需求输入，支持一键复用
+    \item \textbf{快速入口：}常用场景的快捷按钮（如"做一个记账本"）
+\end{itemize}
+
+\subsubsection{交互流程}
+\begin{enumerate}[leftmargin=2em]
+    \item 用户输入需求描述（文本或语音）
+    \item AI实时分析需求，显示理解状态
+    \item 如需补充信息，AI主动提问
+    \item 需求明确后，自动进入方案确认页
+\end{enumerate}
+
+\subsection{页面二：方案确认页}
+
+\subsubsection{页面定位}
+展示AI理解的需求方案，让用户确认或调整后再生成。
+
+\subsubsection{核心元素}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{方案卡片：}展示应用名称、功能列表、预览效果图
+    \item \textbf{功能开关：}每个功能可单独开启/关闭
+    \item \textbf{样式选择：}颜色主题、布局风格等基础样式选项
+    \item \textbf{生成按钮：}醒目的"一键生成"按钮
+\end{itemize}
+
+\subsubsection{交互流程}
+\begin{enumerate}[leftmargin=2em]
+    \item 展示AI生成的应用方案
+    \item 用户可调整功能配置和样式偏好
+    \item 确认无误后，点击"一键生成"
+    \item 显示生成进度，完成后自动跳转预览
+\end{enumerate}
+
+\subsection{页面三：应用预览页}
+
+\subsubsection{页面定位}
+在WebView沙箱中实时预览和运行生成的应用。
+
+\subsubsection{核心元素}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{WebView区域：}全屏或可调整大小的预览窗口
+    \item \textbf{工具栏：}刷新、全屏、调试、分享等功能按钮
+    \item \textbf{信息面板：}显示应用信息（名称、创建时间、文件大小等）
+    \item \textbf{操作菜单：}编辑需求、重新生成、保存到工具箱等
+\end{itemize}
+
+\subsubsection{交互流程}
+\begin{enumerate}[leftmargin=2em]
+    \item 自动加载并运行生成的HTML应用
+    \item 用户可全屏体验应用功能
+    \item 如需调整，可返回修改需求重新生成
+    \item 满意后保存到"我的工具箱"
+\end{enumerate}
+
+\subsection{页面四：我的工具箱}
+
+\subsubsection{页面定位}
+集中管理所有已创建的个人应用。
+
+\subsubsection{核心元素}
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{应用列表：}卡片式展示所有已创建的应用
+    \item \textbf{分类标签：}按场景或自定义标签分类
+    \item \textbf{搜索栏：}快速查找应用
+    \item \textbf{排序选项：}按创建时间、使用频率、名称等排序
+    \item \textbf{批量操作：}多选后进行删除、导出等操作
+\end{itemize}
+
+\subsubsection{交互流程}
+\begin{enumerate}[leftmargin=2em]
+    \item 进入工具箱，浏览已创建的应用
+    \item 点击应用卡片，直接打开预览
+    \item 长按应用，进入编辑/删除/分享模式
+    \item 点击"+"按钮，返回灵感输入页创建新应用
+\end{enumerate}
+
+% ==================== 第八章：核心创新点 ====================
+\section{核心创新点}
+
+蓝心快搭在多个维度实现了创新突破：
+
+\subsection{形态创新：对话即开发}
+
+\begin{table}[H]
+    \centering
+    \caption{形态创新对比}
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+        \hline
+        \textbf{维度} & \textbf{传统方式} & \textbf{蓝心快搭} \\
+        \hline
+        交互方式 & 图形界面拖拽、表单配置 & \highlight{自然语言对话} \\
+        \hline
+        用户门槛 & 需要理解低代码概念 & \highlight{零学习成本} \\
+        \hline
+        灵活性 & 受限于平台提供的组件 & \highlight{AI理解任意需求} \\
+        \hline
+        效率 & 仍需数小时配置 & \highlight{分钟级交付} \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{技术创新：端侧AI + 云端协同}
+
+\begin{itemize}[leftmargin=2em]
+    \item \highlight{端侧优先：}简单任务在端侧完成，低延迟、离线可用、隐私保护
+    \item \highlight{云端增强：}复杂任务调用云端大模型，保证生成质量
+    \item \highlight{智能调度：}根据任务复杂度、网络状况、设备性能动态选择执行位置
+    \item \highlight{渐进增强：}端侧能力持续进化，逐步减少对云端的依赖
+\end{itemize}
+
+\subsection{生态创新：系统级深度融合}
+
+\begin{itemize}[leftmargin=2em]
+    \item \highlight{OriginOS深度集成：}与vivo系统服务无缝对接，获取原生级能力
+    \item \highlight{系统能力调用：}直接调用相机、传感器、通讯录等系统服务
+    \item \highlight{统一用户体验：}遵循系统设计规范，用户无感知切换
+    \item \highlight{性能优化：}利用系统级优化，获得更好的性能和续航
+\end{itemize}
+
+\subsection{体验创新：完整移动端闭环}
+
+\begin{table}[H]
+    \centering
+    \caption{移动端闭环体验}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{环节} & \textbf{创新点} \\
+        \hline
+        输入 & 语音+文本多模态输入，自然表达需求 \\
+        \hline
+        理解 & AI深度理解意图，主动澄清模糊需求 \\
+        \hline
+        生成 & 一键生成，实时进度反馈，流式体验 \\
+        \hline
+        预览 & WebView沙箱即时预览，所见即所得 \\
+        \hline
+        管理 & 工具箱集中管理，随时调用和优化 \\
+        \hline
+        分享 & 一键分享，他人可直接使用 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{框架创新：蓝心个人智能框架}
+
+\begin{quote}
+    \textit{``蓝心快搭不仅仅是一个应用生成工具，更是一个个人智能应用框架。''}
+\end{quote}
+
+\begin{itemize}[leftmargin=2em]
+    \item \highlight{个人应用生态：}每个用户都可以构建自己的轻应用生态
+    \item \highlight{持续进化：}AI学习用户习惯，生成越来越贴合需求的应用
+    \item \highlight{知识沉淀：}用户的创意和需求被结构化保存，形成个人知识库
+    \item \highlight{社区共享：}优秀的应用可被社区共享，形成正向循环（远期）
+\end{itemize}
+
+% ==================== 第九章：市场前景 ====================
+\section{市场前景}
+
+\subsection{行业趋势分析}
+
+\subsubsection{低代码/无代码市场爆发}
+
+\begin{table}[H]
+    \centering
+    \caption{行业趋势数据}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{数据来源} & \textbf{核心数据} \\
+        \hline
+        \highlight{Gartner预测} & 到2025年，70\%的新应用将由低代码或无代码技术构建 \\
+        \hline
+        \highlight{中国低代码市场} & 2024年市场规模达131亿元，年复合增长率超过40\% \\
+        \hline
+        \highlight{全球无代码AI市场} & 2024年达70.6亿美元，预计2030年将突破300亿美元 \\
+        \hline
+        \highlight{AI辅助开发} & GitHub Copilot等工具已证明AI可提升开发效率55\%以上 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsubsection{移动端应用生成蓝海}
+
+\begin{itemize}[leftmargin=2em]
+    \item 移动互联网用户超12亿，应用需求持续增长
+    \item 长尾应用需求巨大，但缺乏有效的满足手段
+    \item AI技术成熟度提升，使自然语言生成应用成为可能
+    \item 用户对个性化、场景化应用的需求日益强烈
+\end{itemize}
+
+\subsection{竞品分析}
+
+\begin{table}[H]
+    \centering
+    \caption{竞品对比分析表}
+    \begin{tabularx}{\textwidth}{|l|l|l|l|l|X|}
+        \hline
+        \textbf{特性} & \textbf{GitHub Spark} & \textbf{阿里Meoo} & \textbf{蚂蚁灵光} & \textbf{字节扣子} & \textbf{蓝心快搭} \\
+        \hline
+        目标平台 & Web & 移动端 & 移动端 & Web/Bot & \highlight{移动端} \\
+        \hline
+        输入方式 & 自然语言 & 自然语言 & 自然语言 & 拖拽+配置 & \highlight{自然语言} \\
+        \hline
+        输出形态 & Web应用 & 原生应用 & 小程序 & Bot应用 & \highlight{单HTML} \\
+        \hline
+        生成速度 & 快 & 中 & 中 & 慢 & \highlight{极快} \\
+        \hline
+        端侧AI & 无 & 无 & 无 & 无 & \highlight{有} \\
+        \hline
+        系统集成 & 无 & 一般 & 一般 & 无 & \highlight{深度集成} \\
+        \hline
+        离线能力 & 无 & 无 & 无 & 无 & \highlight{部分支持} \\
+        \hline
+        隐私保护 & 云端处理 & 云端处理 & 云端处理 & 云端处理 & \highlight{端侧优先} \\
+        \hline
+        生态定位 & 开发者 & 消费者 & 消费者 & 开发者 & \highlight{普通用户} \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{商业模式}
+
+\begin{table}[H]
+    \centering
+    \caption{商业模式设计}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{模式} & \textbf{具体策略} \\
+        \hline
+        \highlight{免费增值} & 基础功能免费，高级功能（如APK打包、云端同步）付费 \\
+        \hline
+        \highlight{API调用计费} & 超出免费额度的蓝心API调用按量计费 \\
+        \hline
+        \highlight{应用市场} & 优质应用可上架vivo应用商店，分成收益（远期） \\
+        \hline
+        \highlight{企业版} & 面向企业的定制化解决方案（远期） \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第十章：可行性分析 ====================
+\section{可行性分析}
+
+\subsection{技术可行性}
+
+\begin{table}[H]
+    \centering
+    \caption{技术可行性评估表}
+    \begin{tabularx}{\textwidth}{|l|X|c|}
+        \hline
+        \textbf{技术点} & \textbf{可行性分析} & \textbf{风险等级} \\
+        \hline
+        自然语言理解 & 蓝心大模型已具备强大的NLU能力，支持多轮对话 & \highlight{低} \\
+        \hline
+        代码生成 & 蓝心Code能力已成熟，可生成高质量HTML/CSS/JS & \highlight{低} \\
+        \hline
+        WebView渲染 & Android WebView技术成熟，性能稳定 & \highlight{低} \\
+        \hline
+        端侧推理 & vivo端侧大模型已在多款机型上验证 & \highlight{低} \\
+        \hline
+        安全沙箱 & Android WebView天然支持沙箱隔离 & \highlight{低} \\
+        \hline
+        系统集成 & OriginOS提供丰富的系统API & \highlight{低} \\
+        \hline
+        性能优化 & 端侧推理优化技术成熟 & \highlight{中} \\
+        \hline
+        离线能力 & 端侧模型大小和能力需权衡 & \highlight{中} \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{生态可行性}
+
+\begin{itemize}[leftmargin=2em]
+    \item \highlight{蓝心生态支持：}vivo蓝心大模型提供完整的SDK和开发文档
+    \item \highlight{OriginOS兼容：}与vivo系统深度集成，获得原生级体验
+    \item \highlight{开发者社区：}vivo开发者社区提供技术支持和交流平台
+    \item \highlight{应用分发渠道：}可借助vivo应用商店进行分发和推广
+\end{itemize}
+
+\subsection{风险与应对}
+
+\begin{table}[H]
+    \centering
+    \caption{风险识别与应对策略表}
+    \begin{tabularx}{\textwidth}{|l|X|X|}
+        \hline
+        \textbf{风险类型} & \textbf{风险描述} & \textbf{应对策略} \\
+        \hline
+        生成质量风险 & AI生成的代码可能存在bug或体验不佳 & 多轮测试+人工审核+用户反馈迭代 \\
+        \hline
+        性能风险 & 复杂应用在WebView中运行卡顿 & 代码优化+性能监控+复杂度限制 \\
+        \hline
+        安全风险 & 生成代码可能包含安全漏洞 & 静态分析+沙箱隔离+权限控制 \\
+        \hline
+        隐私风险 & 用户需求数据可能涉及隐私 & 端侧优先+数据加密+最小化采集 \\
+        \hline
+        竞争风险 & 巨头入场竞争 & 深耕垂直场景+强化端侧优势+系统级壁垒 \\
+        \hline
+        技术迭代风险 & AI技术快速迭代 & 模块化设计+持续技术跟踪+快速迭代能力 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+% ==================== 第十一章：开发计划 ====================
+\section{开发计划}
+
+蓝心快搭的开发分为四个阶段，采用敏捷开发模式，快速迭代。
+
+\subsection{第一阶段：需求与设计（第1-2周）}
+
+\begin{table}[H]
+    \centering
+    \caption{第一阶段里程碑}
+    \begin{tabularx}{\textwidth}{|l|X|c|}
+        \hline
+        \textbf{任务} & \textbf{具体内容} & \textbf{交付物} \\
+        \hline
+        需求细化 & 完善用户故事、功能清单、验收标准 & 需求文档 \\
+        \hline
+        技术调研 & 蓝心SDK集成调研、WebView能力评估 & 技术调研报告 \\
+        \hline
+        原型设计 & 完成4个核心页面的高保真原型 & 原型文件 \\
+        \hline
+        架构设计 & 确定技术架构、模块划分、接口定义 & 架构设计文档 \\
+        \hline
+        环境搭建 & 开发环境配置、CI/CD流程建立 & 可用开发环境 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{第二阶段：核心开发（第3-5周）}
+
+\begin{table}[H]
+    \centering
+    \caption{第二阶段里程碑}
+    \begin{tabularx}{\textwidth}{|l|X|c|}
+        \hline
+        \textbf{任务} & \textbf{具体内容} & \textbf{交付物} \\
+        \hline
+        交互层开发 & 灵感输入页、方案确认页UI开发 & 可交互UI \\
+        \hline
+        智能引擎集成 & 蓝心SDK集成、需求理解、代码生成 & AI引擎模块 \\
+        \hline
+        WebView沙箱 & 预览环境搭建、安全沙箱实现 & 预览功能 \\
+        \hline
+        应用管理 & 工具箱功能开发、本地存储实现 & 管理功能 \\
+        \hline
+        联调测试 & 模块间联调、功能测试 & 可运行版本 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{第三阶段：集成联调（第6-7周）}
+
+\begin{table}[H]
+    \centering
+    \caption{第三阶段里程碑}
+    \begin{tabularx}{\textwidth}{|l|X|c|}
+        \hline
+        \textbf{任务} & \textbf{具体内容} & \textbf{交付物} \\
+        \hline
+        端云联调 & 端侧与云端AI协同调试 & 协同机制 \\
+        \hline
+        性能优化 & 启动速度、响应时间、内存占用优化 & 性能达标 \\
+        \hline
+        兼容性测试 & 多机型、多系统版本测试 & 兼容性报告 \\
+        \hline
+        安全审计 & 代码安全检查、隐私合规审查 & 安全报告 \\
+        \hline
+        用户测试 & 内部用户测试、收集反馈 & 测试反馈 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{第四阶段：优化打磨（第8周）}
+
+\begin{table}[H]
+    \centering
+    \caption{第四阶段里程碑}
+    \begin{tabularx}{\textwidth}{|l|X|c|}
+        \hline
+        \textbf{任务} & \textbf{具体内容} & \textbf{交付物} \\
+        \hline
+        体验优化 & UI细节打磨、交互动效优化 & 最终UI \\
+        \hline
+        Bug修复 & 修复测试阶段发现的所有问题 & 稳定版本 \\
+        \hline
+        文档完善 & 用户手册、技术文档、演示材料 & 完整文档 \\
+        \hline
+        演示准备 & 演示脚本、Demo场景、评委问答准备 & 演示方案 \\
+        \hline
+        最终发布 & 打包提交、材料整理 & 初赛提交物 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{开发进度甘特图}
+
+\begin{table}[H]
+    \centering
+    \caption{开发进度规划}
+    \small
+    \begin{tabular}{|l|*{8}{>{\centering\arraybackslash}p{1.2cm}|}}
+        \hline
+        \textbf{阶段} & \textbf{W1} & \textbf{W2} & \textbf{W3} & \textbf{W4} & \textbf{W5} & \textbf{W6} & \textbf{W7} & \textbf{W8} \\
+        \hline
+        需求设计 & \cellcolor{vivoblue!30}$\bullet$ & \cellcolor{vivoblue!30}$\bullet$ & & & & & & \\
+        \hline
+        核心开发 & & & \cellcolor{accentgreen!30}$\bullet$ & \cellcolor{accentgreen!30}$\bullet$ & \cellcolor{accentgreen!30}$\bullet$ & & & \\
+        \hline
+        集成联调 & & & & & & \cellcolor{accentorange!30}$\bullet$ & \cellcolor{accentorange!30}$\bullet$ & \\
+        \hline
+        优化打磨 & & & & & & & & \cellcolor{red!20}$\bullet$ \\
+        \hline
+    \end{tabular}
+\end{table}
+
+% ==================== 远期展望 ====================
+\section{远期展望}
+
+\subsection{APK打包能力}
+
+初赛版本聚焦于\highlight{单HTML文件生成 + 内置WebView预览}的轻量化方案。在远期规划中，蓝心快搭将支持：
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{APK一键打包：}将HTML应用打包为独立的Android APK文件
+    \item \textbf{图标定制：}支持自定义应用图标和启动画面
+    \item \textbf{权限声明：}根据应用功能自动生成所需权限声明
+    \item \textbf{签名发布：}支持应用签名，可上架应用商店
+    \item \textbf{混合应用：}结合原生能力，提供更丰富的系统功能调用
+\end{itemize}
+
+\subsection{其他远期功能}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{云端同步：}应用数据云端备份，多设备同步
+    \item \textbf{社区共享：}优秀应用社区分享，用户可复用他人创作
+    \item \textbf{企业版：}面向企业的定制化解决方案
+    \item \textbf{跨平台支持：}扩展到iOS、HarmonyOS等平台
+    \item \textbf{AI进化：}基于用户反馈持续优化AI生成能力
+\end{itemize}
+
+% ==================== 第十二章：总结 ====================
+\section{总结}
+
+蓝心快搭作为一款基于vivo蓝心大模型的AI驱动零代码移动端应用生成工具，旨在\highlight{将创作的自由还给每个人}。
+
+\subsection{核心优势}
+
+\begin{itemize}[leftmargin=2em]
+    \item \highlight{技术创新：}端侧优先的AI架构，结合云端协同，实现高效、安全的应用生成
+    \item \highlight{体验创新：}对话即开发的交互模式，零学习成本，分钟级交付
+    \item \highlight{生态创新：}与vivo OriginOS深度融合，获得系统级能力支持
+    \item \highlight{价值创新：}释放亿万普通用户的创造力，构建人人皆可参与的应用生态
+\end{itemize}
+
+\subsection{项目价值}
+
+\begin{table}[H]
+    \centering
+    \caption{项目核心价值总结}
+    \begin{tabularx}{\textwidth}{|l|X|}
+        \hline
+        \textbf{价值维度} & \textbf{具体价值} \\
+        \hline
+        \highlight{用户价值} & 让普通用户也能创建应用，满足个性化需求 \\
+        \hline
+        \highlight{技术价值} & 探索端侧AI应用生成的最佳实践 \\
+        \hline
+        \highlight{生态价值} & 丰富vivo应用生态，提升系统竞争力 \\
+        \hline
+        \highlight{社会价值} & 降低技术门槛，促进数字素养提升 \\
+        \hline
+    \end{tabularx}
+\end{table}
+
+\subsection{竞赛目标}
+
+在第三届(2026)中国高校计算机大赛-AIGC创新赛中，蓝心快搭将：
+
+\begin{itemize}[leftmargin=2em]
+    \item 展示端侧AI在应用生成领域的创新应用
+    \item 验证"对话即开发"模式的可行性和用户接受度
+    \item 探索蓝心大模型与移动端深度集成的最佳实践
+    \item 为普通用户提供一个真正可用的零代码应用创建工具
+\end{itemize}
+
+\infobox{项目愿景}{蓝心快搭不仅是一个参赛作品，更是一个面向未来的个人智能应用框架。我们相信，当每个人都能轻松创建自己的应用时，移动互联网将迎来一个全新的创新时代。}
+
+\vspace{2cm}
+
+\begin{center}
+    \Large\textbf{感谢评审专家的宝贵时间！}
+\end{center}
+
+\end{document}
