@@ -41,7 +41,7 @@ fun MessageBubble(
         ) {
             // 角色标签
             Text(
-                text = if (isUser) "你" else "BlueSnap",
+                text = if (isUser) "你" else "蓝心快搭",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(

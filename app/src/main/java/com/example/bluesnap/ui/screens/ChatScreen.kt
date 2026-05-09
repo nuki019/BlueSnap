@@ -76,7 +76,7 @@ fun ChatScreen(
             TopAppBar(
                 title = {
                     Column {
-                        Text("BlueSnap", style = MaterialTheme.typography.titleMedium)
+                        Text("蓝心快搭", style = MaterialTheme.typography.titleMedium)
                         Text(
                             "AI 应用生成助手",
                             style = MaterialTheme.typography.bodySmall,
@@ -134,7 +134,7 @@ fun ChatScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "BlueSnap正在构思中...",
+                                text = "蓝心快搭正在构思中...",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = BluePrimary.copy(alpha = 0.7f)
                             )

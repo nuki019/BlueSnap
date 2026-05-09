@@ -53,7 +53,7 @@ fun StreamingBubble(
         ) {
             // 角色标签
             Text(
-                text = "BlueSnap",
+                text = "蓝心快搭",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)

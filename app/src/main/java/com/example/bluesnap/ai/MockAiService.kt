@@ -505,8 +505,8 @@ p{color:#666;font-size:14px;line-height:1.6;margin-bottom:24px}
 <body>
 <div class="card">
 <div class="icon">✨</div>
-<h1>BlueSnap</h1>
-<p>这是一个由AI生成的轻量工具。你可以通过对话告诉BlueSnap你的具体需求，生成更贴合的应用。</p>
+<h1>蓝心快搭</h1>
+<p>这是一个由AI生成的轻量工具。你可以通过对话告诉蓝心快搭你的具体需求，生成更贴合的应用。</p>
 <div class="counter" id="count">0</div>
 <button class="btn" onclick="document.getElementById('count').textContent=parseInt(document.getElementById('count').textContent)+1">点击计数</button>
 <button class="btn" style="background:#f0f0f0;color:#666" onclick="document.getElementById('count').textContent=0">重置</button>

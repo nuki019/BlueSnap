@@ -2,7 +2,7 @@ package com.example.bluesnap.ui.theme
 
 import androidx.compose.ui.graphics.Color
 
-// ── BlueSnap品牌色 ─────────────────────────────────────────────────
+// ── 蓝心快搭品牌色 ─────────────────────────────────────────────────
 val BluePrimary = Color(0xFF1A73E8)       // vivo蓝，主色调
 val BluePrimaryDark = Color(0xFF0D47A1)   // 深蓝，渐变/强调
 val BluePrimaryLight = Color(0xFFE3F2FD)  // 浅蓝，背景/气泡

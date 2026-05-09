@@ -1,4 +1,4 @@
-# BlueSnap - 应用技术设计文档
+# 蓝心快搭 - 应用技术设计文档
 
 ## 一、整体架构
 
@@ -57,7 +57,7 @@ com.example.bluesnap/
 │   └── MainViewModel.kt         # 主ViewModel，管理全局状态
 └── ui/
     ├── theme/
-    │   ├── Color.kt              # BlueSnap品牌色彩
+    │   ├── Color.kt              # 蓝心快搭品牌色彩
     │   ├── Theme.kt              # Material3主题配置
     │   └── Type.kt               # 字体配置
     ├── navigation/
@@ -264,13 +264,13 @@ confirmPlan():
 ### 5.2 四页面设计
 
 **HomeScreen**：
-- 顶部：BlueSnap logo + 标语
+- 顶部：蓝心快搭 logo + 标语
 - 中部：6个场景模板Chip（横排两行，可横向滚动）
 - 底部：大输入框 + 发送按钮 + 语音按钮(图标)
 - 点击模板：自动填充输入框并跳转ChatScreen
 
 **ChatScreen**：
-- 顶部：返回按钮 + "BlueSnap" 标题
+- 顶部：返回按钮 + "蓝心快搭" 标题
 - 主体：LazyColumn消息列表，用户蓝色气泡(右) / AI灰色气泡(左)
 - AI含方案时：气泡内嵌"查看方案"按钮
 - 底部：输入框 + 发送按钮
@@ -380,7 +380,7 @@ webView.webViewClient = object : WebViewClient() {
 
 ### 8.1 演示流程
 
-1. **启动**：展示BlueSnap首页，标语"将创作的自由还给每个人"
+1. **启动**：展示蓝心快搭首页，标语"将创作的自由还给每个人"
 2. **输入需求**：点击"番茄钟"模板，或手动输入"做一个番茄钟应用"
 3. **AI对话**：展示AI回复，含功能方案描述
 4. **方案确认**：跳转方案页，展示功能清单和布局选择
