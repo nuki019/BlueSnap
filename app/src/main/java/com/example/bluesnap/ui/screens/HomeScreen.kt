@@ -77,7 +77,7 @@ fun HomeScreen(
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Text(
-                    text = "将创作的自由还给每个人",
+                    text = "给社团负责人和班委的轻应用生成器",
                     style = MaterialTheme.typography.bodyLarge,
                     color = Color.White.copy(alpha = 0.8f)
                 )
@@ -156,7 +156,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "例如：我想要一个带统计功能的番茄钟应用",
+                            "例如：给迎新活动做一个报名、分工和预算管理工具",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },

@@ -1,10 +1,8 @@
 package com.example.bluesnap.ai
 
 import android.util.Log
-import com.example.bluesnap.BuildConfig
 import com.example.bluesnap.data.*
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.withContext
@@ -26,7 +24,9 @@ private const val TAG = "RealAiService"
  * 遵循 OpenAI 兼容协议格式，使用 OkHttp 进行网络请求。
  * 支持 SSE 流式输出（chat）和非流式调用（plan / HTML）。
  */
-class RealAiService : AiService {
+class RealAiService(
+    private val config: AiConfig
+) : AiService {
 
     /** 普通请求客户端（chat / plan） */
     private val client = OkHttpClient.Builder()
@@ -60,20 +60,20 @@ class RealAiService : AiService {
         val requestId = UUID.randomUUID().toString()
 
         val body = JSONObject().apply {
-            put("model", BuildConfig.AI_MODEL)
+            put("model", config.model)
             put("messages", apiMessages)
             put("stream", true)
             put("temperature", 0.8)
             put("max_tokens", 1024)
         }
 
-        val url = "${BuildConfig.AI_BASE_URL}/chat/completions?request_id=$requestId"
+        val url = buildChatUrl(requestId)
         Log.d(TAG, "流式请求 URL: $url")
 
         val request = Request.Builder()
             .url(url)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer ${BuildConfig.AI_API_KEY}")
+            .addHeader("Authorization", "Bearer ${config.apiKey}")
             .post(body.toString().toRequestBody(jsonType))
             .build()
 
@@ -124,16 +124,17 @@ class RealAiService : AiService {
                     }
                 }
 
-                // 最终发送完整内容（确保最后一批不丢失）
-                if (buffer.isNotEmpty()) {
-                    Log.d(TAG, "发送最终内容，长度: ${buffer.length}")
-                    trySend(buffer.toString())
+                if (buffer.isEmpty()) {
+                    throw AiException("API 返回空流")
                 }
+
+                // 最终发送完整内容（确保最后一批不丢失）
+                Log.d(TAG, "发送最终内容，长度: ${buffer.length}")
+                trySend(buffer.toString())
 
             } catch (e: Exception) {
                 Log.e(TAG, "流式请求异常", e)
-                // 发送已收到的部分内容（兜底）
-                // buffer 在此作用域外，通过外部引用处理
+                throw e
             } finally {
                 response?.close()
                 Log.d(TAG, "chatStream Flow 完成")
@@ -181,14 +182,14 @@ class RealAiService : AiService {
         val requestId = UUID.randomUUID().toString()
 
         val body = JSONObject().apply {
-            put("model", BuildConfig.AI_MODEL)
+            put("model", config.model)
             put("messages", messages)
             put("stream", stream)
             put("temperature", temperature)
             put("max_tokens", maxTokens)
         }
 
-        val url = "${BuildConfig.AI_BASE_URL}/chat/completions?request_id=$requestId"
+        val url = buildChatUrl(requestId)
         val timeoutLabel = if (useLongTimeout) "300s" else "120s"
         Log.d(TAG, "请求 URL: $url (timeout=$timeoutLabel, stream=$stream)")
         Log.d(TAG, "请求 Body: ${body.toString().take(500)}")
@@ -196,7 +197,7 @@ class RealAiService : AiService {
         val request = Request.Builder()
             .url(url)
             .addHeader("Content-Type", "application/json")
-            .addHeader("Authorization", "Bearer ${BuildConfig.AI_API_KEY}")
+            .addHeader("Authorization", "Bearer ${config.apiKey}")
             .post(body.toString().toRequestBody(jsonType))
             .build()
 
@@ -235,6 +236,15 @@ class RealAiService : AiService {
         val content = message.optString("content", "")
         Log.d(TAG, "AI 回复: ${content.take(200)}")
         return content
+    }
+
+    private fun buildChatUrl(requestId: String): String {
+        val path = "${config.baseUrl.trimEnd('/')}/chat/completions"
+        return if (config.provider == "vivo") {
+            "$path?request_id=$requestId"
+        } else {
+            path
+        }
     }
 
     // ── 消息构建 ──────────────────────────────────────────────────────
@@ -307,8 +317,7 @@ class RealAiService : AiService {
         // 尝试直接提取 HTML
         val htmlRegex = Regex("<!DOCTYPE[\\s\\S]*?</html>", RegexOption.IGNORE_CASE)
         htmlRegex.find(text)?.let { return it.value.trim() }
-        // 兜底：返回原文
-        return text
+        throw AiException("AI 未返回完整 HTML，已阻止加载裸文本")
     }
 
     companion object {

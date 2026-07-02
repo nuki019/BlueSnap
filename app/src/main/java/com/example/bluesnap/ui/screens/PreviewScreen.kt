@@ -1,12 +1,20 @@
 package com.example.bluesnap.ui.screens
 
 import android.annotation.SuppressLint
+import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import android.util.Log
 import android.view.ViewGroup
 import android.webkit.ConsoleMessage
 import android.webkit.WebChromeClient
+import android.webkit.WebResourceRequest
+import android.webkit.WebResourceResponse
 import android.webkit.WebView
 import android.webkit.WebViewClient
+import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -15,16 +23,22 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.FileProvider
+import com.example.bluesnap.BuildConfig
 import com.example.bluesnap.data.GeneratedApp
 import com.example.bluesnap.ui.theme.BluePrimary
+import java.io.ByteArrayInputStream
+import java.io.File
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -35,7 +49,18 @@ fun PreviewScreen(
     onBack: () -> Unit
 ) {
     var feedbackText by remember { mutableStateOf("") }
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    var pendingExportApp by remember { mutableStateOf<GeneratedApp?>(null) }
+    val exportLauncher = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.CreateDocument("text/html")
+    ) { uri ->
+        val exportApp = pendingExportApp
+        pendingExportApp = null
+        if (uri != null && exportApp != null) {
+            exportHtml(context, uri, exportApp)
+        }
+    }
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         // 顶部工具栏
@@ -45,6 +70,21 @@ fun PreviewScreen(
                     app?.name ?: "预览",
                     style = MaterialTheme.typography.titleMedium
                 )
+            },
+            actions = {
+                if (app != null) {
+                    TextButton(
+                        onClick = {
+                            pendingExportApp = app
+                            exportLauncher.launch("${safeHtmlFileName(app.name)}.html")
+                        }
+                    ) {
+                        Text("导出")
+                    }
+                    IconButton(onClick = { shareHtml(context, app) }) {
+                        Icon(Icons.Filled.Share, contentDescription = "分享 HTML")
+                    }
+                }
             },
             navigationIcon = {
                 IconButton(onClick = onBack) {
@@ -83,7 +123,7 @@ fun PreviewScreen(
                         }
                     }
                 } else {
-                    AppWebView(htmlContent = app.htmlContent)
+                    AppWebView(app = app)
                 }
             }
 
@@ -170,7 +210,8 @@ private const val DEBUG_JS_BRIDGE = """
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-private fun AppWebView(htmlContent: String) {
+private fun AppWebView(app: GeneratedApp) {
+    val baseUrl = "https://${app.id}.localhost/"
     AndroidView(
         factory = { context ->
             WebView(context).apply {
@@ -178,34 +219,54 @@ private fun AppWebView(htmlContent: String) {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                webViewClient = WebViewClient()
-                webChromeClient = object : WebChromeClient() {
-                    override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
-                        consoleMessage?.let {
-                            Log.d("WebViewJS", "[${it.messageLevel()}] ${it.message()} (${it.sourceId()}:${it.lineNumber()})")
-                        }
-                        return true
+                webViewClient = object : WebViewClient() {
+                    override fun shouldOverrideUrlLoading(
+                        view: WebView?,
+                        request: WebResourceRequest?
+                    ): Boolean {
+                        return !isAllowedWebViewUrl(request?.url)
                     }
+
+                    override fun shouldInterceptRequest(
+                        view: WebView?,
+                        request: WebResourceRequest?
+                    ): WebResourceResponse? {
+                        val url = request?.url ?: return blockedResponse()
+                        return if (isAllowedWebViewUrl(url)) null else blockedResponse()
+                    }
+                }
+                webChromeClient = if (isWebDebugEnabled()) {
+                    object : WebChromeClient() {
+                        override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
+                            consoleMessage?.let {
+                                Log.d("WebViewJS", "[${it.messageLevel()}] ${it.message()} (${it.sourceId()}:${it.lineNumber()})")
+                            }
+                            return true
+                        }
+                    }
+                } else {
+                    WebChromeClient()
                 }
                 settings.apply {
                     javaScriptEnabled = true
                     domStorageEnabled = true
                     allowFileAccess = false
                     allowContentAccess = false
+                    allowFileAccessFromFileURLs = false
+                    allowUniversalAccessFromFileURLs = false
                     javaScriptCanOpenWindowsAutomatically = false
                     setSupportZoom(false)
                     builtInZoomControls = false
                     displayZoomControls = false
                     loadWithOverviewMode = true
                     useWideViewPort = true
-                    // 允许混合内容（本地生成的 HTML 可能包含 data: URI）
-                    mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
+                    mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
                 }
                 // 使用 https://localhost 作为 base URL，使 WebView 以安全上下文运行
                 // 这样 localStorage、sessionStorage 等 API 才能正常工作
                 loadDataWithBaseURL(
-                    "https://localhost",
-                    wrapWithDebugBridge(htmlContent),
+                    baseUrl,
+                    wrapWithDebugBridgeIfNeeded(app.htmlContent),
                     "text/html",
                     "UTF-8",
                     null
@@ -214,8 +275,8 @@ private fun AppWebView(htmlContent: String) {
         },
         update = { webView ->
             webView.loadDataWithBaseURL(
-                "https://localhost",
-                wrapWithDebugBridge(htmlContent),
+                baseUrl,
+                wrapWithDebugBridgeIfNeeded(app.htmlContent),
                 "text/html",
                 "UTF-8",
                 null
@@ -228,7 +289,8 @@ private fun AppWebView(htmlContent: String) {
 /**
  * 在 HTML 的 <head> 中注入调试桥接脚本，用于捕获 JS 错误。
  */
-private fun wrapWithDebugBridge(html: String): String {
+private fun wrapWithDebugBridgeIfNeeded(html: String): String {
+    if (!isWebDebugEnabled()) return html
     // 如果 HTML 包含 </head>，在其前面注入调试脚本
     val headCloseIndex = html.indexOf("</head>", ignoreCase = true)
     return if (headCloseIndex != -1) {
@@ -239,4 +301,72 @@ private fun wrapWithDebugBridge(html: String): String {
         // 没有 </head> 标签，直接在开头注入
         "<script>$DEBUG_JS_BRIDGE</script>$html"
     }
+}
+
+private fun isWebDebugEnabled(): Boolean = BuildConfig.DEBUG && !BuildConfig.AI_DEMO_MODE
+
+private fun isAllowedWebViewUrl(uri: Uri?): Boolean {
+    if (uri == null) return false
+    val scheme = uri.scheme?.lowercase() ?: return false
+    return when (scheme) {
+        "about", "data", "blob" -> true
+        "http", "https" -> {
+            val host = uri.host?.lowercase()
+            host == "localhost" ||
+                host?.endsWith(".localhost") == true ||
+                host == "127.0.0.1" ||
+                host == "::1"
+        }
+        else -> false
+    }
+}
+
+private fun blockedResponse(): WebResourceResponse {
+    return WebResourceResponse(
+        "text/plain",
+        "UTF-8",
+        ByteArrayInputStream(ByteArray(0))
+    )
+}
+
+private fun shareHtml(context: Context, app: GeneratedApp) {
+    runCatching {
+        val dir = File(context.cacheDir, "shared_html").apply { mkdirs() }
+        val safeName = safeHtmlFileName(app.name)
+        val file = File(dir, "$safeName.html")
+        file.writeText(app.htmlContent, Charsets.UTF_8)
+        val uri = FileProvider.getUriForFile(
+            context,
+            "${context.packageName}.fileprovider",
+            file
+        )
+        val intent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/html"
+            putExtra(Intent.EXTRA_STREAM, uri)
+            putExtra(Intent.EXTRA_SUBJECT, app.name)
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
+        }
+        context.startActivity(Intent.createChooser(intent, "分享 HTML"))
+    }.onFailure {
+        Log.e("PreviewScreen", "分享 HTML 失败", it)
+        Toast.makeText(context, "分享失败，请稍后重试", Toast.LENGTH_SHORT).show()
+    }
+}
+
+private fun exportHtml(context: Context, uri: Uri, app: GeneratedApp) {
+    runCatching {
+        context.contentResolver.openOutputStream(uri)?.use { output ->
+            output.write(app.htmlContent.toByteArray(Charsets.UTF_8))
+        } ?: error("无法打开导出目标")
+        Toast.makeText(context, "HTML 已导出，可离线使用", Toast.LENGTH_SHORT).show()
+    }.onFailure {
+        Log.e("PreviewScreen", "导出 HTML 失败", it)
+        Toast.makeText(context, "导出失败，请重试", Toast.LENGTH_SHORT).show()
+    }
+}
+
+private fun safeHtmlFileName(name: String): String {
+    return name
+        .replace(Regex("[^A-Za-z0-9_\\-\\u4e00-\\u9fa5]"), "_")
+        .ifBlank { "bluesnap_app" }
 }

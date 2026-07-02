@@ -11,6 +11,14 @@ val localProps = Properties().apply {
     if (f.exists()) load(f.inputStream())
 }
 
+fun prop(name: String, default: String): String =
+    localProps.getProperty(name, default)
+
+fun quotedBuildConfig(value: String): String =
+    "\"" + value
+        .replace("\\", "\\\\")
+        .replace("\"", "\\\"") + "\""
+
 android {
     namespace = "com.example.bluesnap"
     compileSdk {
@@ -28,9 +36,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        buildConfigField("String", "AI_API_KEY", "\"${localProps.getProperty("ai.api.key", "YOUR_API_KEY_HERE")}\"")
-        buildConfigField("String", "AI_BASE_URL", "\"${localProps.getProperty("ai.base.url", "https://api-ai.vivo.com.cn/v1")}\"")
-        buildConfigField("String", "AI_MODEL", "\"${localProps.getProperty("ai.model", "Doubao-Seed-2.0-pro")}\"")
+        buildConfigField("String", "AI_PROVIDER", quotedBuildConfig(prop("ai.provider", "vivo")))
+        buildConfigField("String", "AI_FALLBACK_PROVIDER", quotedBuildConfig(prop("ai.fallback.provider", "mock")))
+        buildConfigField("boolean", "AI_DEMO_MODE", prop("ai.demo.mode", "true").toBooleanStrictOrNull()?.toString() ?: "true")
+        buildConfigField("String", "AI_API_KEY", quotedBuildConfig(prop("ai.api.key", "YOUR_API_KEY_HERE")))
+        buildConfigField("String", "AI_BASE_URL", quotedBuildConfig(prop("ai.base.url", "https://api-ai.vivo.com.cn/v1")))
+        buildConfigField("String", "AI_MODEL", quotedBuildConfig(prop("ai.model", "Doubao-Seed-2.0-pro")))
     }
 
     buildTypes {

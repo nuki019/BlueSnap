@@ -8,6 +8,11 @@ local.properties
 /captures
 .externalNativeBuild
 .cxx
+.env
+.env.*
+secrets/
+*api-key*.txt
+*apikey*.txt
 
 # IDE
 .idea/

@@ -4,7 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluesnap.ai.AiService
-import com.example.bluesnap.ai.RealAiService
+import com.example.bluesnap.ai.AiServiceFactory
 import com.example.bluesnap.data.*
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -14,7 +14,7 @@ import kotlinx.coroutines.launch
 
 class MainViewModel : ViewModel() {
 
-    private val aiService: AiService = RealAiService()
+    private val aiService: AiService = AiServiceFactory.create()
 
     private val _state = MutableStateFlow(AppState())
     val state: StateFlow<AppState> = _state.asStateFlow()
@@ -110,7 +110,11 @@ class MainViewModel : ViewModel() {
     }
 
     fun confirmPlan() {
-        val plan = _state.value.currentPlan ?: return
+        val currentPlan = _state.value.currentPlan ?: return
+        val plan = ensureAtLeastOneFeature(currentPlan)
+        if (plan != currentPlan) {
+            _state.update { it.copy(currentPlan = plan) }
+        }
         _state.update { it.copy(isGenerating = true) }
 
         viewModelScope.launch {
@@ -172,5 +176,13 @@ class MainViewModel : ViewModel() {
     private fun shouldAutoPlan(aiReply: String): Boolean {
         val triggers = listOf("方案", "规划好", "已经理解", "为你设计", "可以生成")
         return triggers.any { aiReply.contains(it) }
+    }
+
+    private fun ensureAtLeastOneFeature(plan: AppPlan): AppPlan {
+        if (plan.features.any { it.enabled } || plan.features.isEmpty()) return plan
+        val updated = plan.features.mapIndexed { index, feature ->
+            if (index == 0) feature.copy(enabled = true) else feature
+        }
+        return plan.copy(features = updated)
     }
 }

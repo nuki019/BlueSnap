@@ -63,6 +63,9 @@ class MockAiService : AiService {
     private fun detectAppType(input: String): Pair<String, String>? {
         val lower = input.lowercase()
         return when {
+            lower.contains("活动") || lower.contains("社团") || lower.contains("报名") ||
+                lower.contains("分工") || lower.contains("预算") || lower.contains("筹备") ->
+                "活动筹备" to "这是一个面向社团负责人和班委的活动筹备助手，支持报名名单、任务分工、预算记录和进度打卡。"
             lower.contains("番茄") || lower.contains("pomodoro") || lower.contains("计时") || lower.contains("倒计时") ->
                 "番茄钟" to "这是一个25分钟番茄工作法计时器，支持专注倒计时、白噪音、每日专注统计等功能。"
             lower.contains("待办") || lower.contains("todo") || lower.contains("清单") || lower.contains("任务") ->
@@ -80,6 +83,16 @@ class MockAiService : AiService {
     // ── 方案库 ────────────────────────────────────────────────────────
 
     private val plans = mapOf(
+        "活动筹备" to AppPlan(
+            name = "活动筹备",
+            description = "社团活动报名、分工、预算和进度管理工具",
+            features = listOf(
+                Feature("报名名单", "快速记录参与者姓名和联系方式"),
+                Feature("任务分工", "按负责人追踪活动准备事项"),
+                Feature("预算记录", "记录支出项目并自动汇总金额"),
+                Feature("进度打卡", "一键标记筹备任务完成状态")
+            )
+        ),
         "番茄钟" to AppPlan(
             name = "番茄钟",
             description = "25分钟专注工作法计时器",
@@ -145,6 +158,7 @@ class MockAiService : AiService {
     // ── HTML模板库 ─────────────────────────────────────────────────────
 
     private val htmlTemplates = mapOf(
+        "活动筹备" to eventHtml,
         "番茄钟" to pomodoroHtml,
         "待办清单" to todoHtml,
         "备忘录" to memoHtml,
@@ -153,6 +167,94 @@ class MockAiService : AiService {
         "通用工具" to genericHtml
     )
 }
+
+// ═══════════════════════════════════════════════════════════════════════
+// HTML 模板：活动筹备
+// ═══════════════════════════════════════════════════════════════════════
+private val eventHtml = """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>活动筹备助手</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:#f4f7fb;color:#17233c;min-height:100vh;padding:18px;padding-bottom:28px}
+.hero{background:linear-gradient(135deg,#1a73e8,#13c2c2);color:#fff;border-radius:22px;padding:22px;margin-bottom:16px;box-shadow:0 10px 28px rgba(26,115,232,.24)}
+.hero h1{font-size:24px;margin-bottom:6px}
+.hero p{font-size:13px;opacity:.86;line-height:1.5}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:18px}
+.stat{background:rgba(255,255,255,.18);border-radius:14px;padding:12px;text-align:center}
+.stat b{display:block;font-size:20px;margin-bottom:3px}
+.stat span{font-size:11px;opacity:.82}
+.tabs{display:flex;gap:8px;margin:14px 0}
+.tab{flex:1;border:0;border-radius:12px;padding:10px 4px;background:#fff;color:#667085;font-weight:700}
+.tab.active{background:#1a73e8;color:#fff}
+.panel{display:none;background:#fff;border-radius:18px;padding:16px;box-shadow:0 3px 14px rgba(16,24,40,.06)}
+.panel.active{display:block}
+.row{display:flex;gap:8px;margin-bottom:10px}
+input{min-width:0;flex:1;border:1px solid #d9e2ef;border-radius:12px;padding:12px;font-size:14px;outline:none;background:#fbfdff}
+input:focus{border-color:#1a73e8}
+button{min-height:44px;cursor:pointer}
+.primary{border:0;border-radius:12px;background:#1a73e8;color:#fff;padding:0 14px;font-weight:700}
+.item{display:flex;align-items:center;gap:10px;background:#f7faff;border-radius:14px;padding:12px;margin-top:9px}
+.item-main{flex:1;min-width:0}
+.item-main b{font-size:15px}
+.item-main p{font-size:12px;color:#667085;margin-top:3px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.chip{font-size:12px;border-radius:999px;background:#e8f1ff;color:#1a73e8;padding:5px 9px}
+.done{opacity:.55}.done b{text-decoration:line-through}
+.danger{border:0;background:transparent;color:#c8ced8;font-size:20px;padding:0 4px}
+.empty{color:#98a2b3;text-align:center;padding:28px 10px;font-size:14px}
+.money{font-weight:800;color:#0f9f6e}
+</style>
+</head>
+<body>
+<section class="hero">
+<h1>🎯 活动筹备助手</h1>
+<p>给社团负责人和班委的一屏式工具：报名、分工、预算、进度都放在手机里。</p>
+<div class="stats">
+<div class="stat"><b id="peopleCount">0</b><span>报名人数</span></div>
+<div class="stat"><b id="taskCount">0</b><span>待办任务</span></div>
+<div class="stat"><b id="budgetTotal">¥0</b><span>预算支出</span></div>
+</div>
+</section>
+<nav class="tabs">
+<button class="tab active" onclick="showTab('people',this)">报名</button>
+<button class="tab" onclick="showTab('tasks',this)">分工</button>
+<button class="tab" onclick="showTab('budget',this)">预算</button>
+</nav>
+<section id="people" class="panel active">
+<div class="row"><input id="personName" placeholder="姓名"><input id="personPhone" placeholder="电话/微信"></div>
+<button class="primary" style="width:100%" onclick="addPerson()">添加报名</button>
+<div id="peopleList"></div>
+</section>
+<section id="tasks" class="panel">
+<div class="row"><input id="taskName" placeholder="任务，如：借教室"><input id="ownerName" placeholder="负责人"></div>
+<button class="primary" style="width:100%" onclick="addTask()">添加分工</button>
+<div id="taskList"></div>
+</section>
+<section id="budget" class="panel">
+<div class="row"><input id="budgetName" placeholder="支出项目"><input id="budgetAmount" type="number" placeholder="金额"></div>
+<button class="primary" style="width:100%" onclick="addBudget()">记录预算</button>
+<div id="budgetList"></div>
+</section>
+<script>
+var state=JSON.parse(localStorage.getItem('eventHelper')||'{"people":[],"tasks":[],"budgets":[]}');
+function save(){localStorage.setItem('eventHelper',JSON.stringify(state));render()}
+function showTab(id,btn){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});btn.classList.add('active')}
+function addPerson(){var n=document.getElementById('personName').value.trim(),p=document.getElementById('personPhone').value.trim();if(!n)return;state.people.unshift({id:Date.now(),name:n,phone:p});document.getElementById('personName').value='';document.getElementById('personPhone').value='';save()}
+function addTask(){var n=document.getElementById('taskName').value.trim(),o=document.getElementById('ownerName').value.trim();if(!n)return;state.tasks.unshift({id:Date.now(),name:n,owner:o||'待分配',done:false});document.getElementById('taskName').value='';document.getElementById('ownerName').value='';save()}
+function addBudget(){var n=document.getElementById('budgetName').value.trim(),a=parseFloat(document.getElementById('budgetAmount').value);if(!n||!a)return;state.budgets.unshift({id:Date.now(),name:n,amount:a});document.getElementById('budgetName').value='';document.getElementById('budgetAmount').value='';save()}
+function del(type,id){state[type]=state[type].filter(function(x){return x.id!==id});save()}
+function toggleTask(id){var t=state.tasks.find(function(x){return x.id===id});if(t)t.done=!t.done;save()}
+function render(){var total=state.budgets.reduce(function(s,x){return s+x.amount},0),open=state.tasks.filter(function(t){return !t.done}).length;document.getElementById('peopleCount').textContent=state.people.length;document.getElementById('taskCount').textContent=open;document.getElementById('budgetTotal').textContent='¥'+total.toFixed(0);renderList('peopleList',state.people,'people');renderList('taskList',state.tasks,'tasks');renderList('budgetList',state.budgets,'budgets')}
+function renderList(id,items,type){var el=document.getElementById(id);if(!items.length){el.innerHTML='<div class="empty">暂无记录</div>';return}el.innerHTML='';items.forEach(function(x){var html='',cls='item';if(type==='people')html='<div class="item-main"><b>'+x.name+'</b><p>'+x.phone+'</p></div><span class="chip">已报名</span>';if(type==='tasks'){cls+=' '+(x.done?'done':'');html='<div class="item-main" onclick="toggleTask('+x.id+')"><b>'+x.name+'</b><p>负责人：'+x.owner+'</p></div><span class="chip">'+(x.done?'完成':'待办')+'</span>'}if(type==='budgets')html='<div class="item-main"><b>'+x.name+'</b><p>活动预算记录</p></div><span class="money">¥'+x.amount.toFixed(0)+'</span>';el.innerHTML+='<div class="'+cls+'">'+html+'<button class="danger" onclick="del(\''+type+'\','+x.id+')">×</button></div>'})}
+render();
+</script>
+</body>
+</html>
+""".trimIndent()
 
 // ═══════════════════════════════════════════════════════════════════════
 // HTML 模板：番茄钟

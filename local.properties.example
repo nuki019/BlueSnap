@@ -1,0 +1,14 @@
+sdk.dir=C\:\\path\\to\\Android\\Sdk
+
+# Demo-safe by default. Keep real keys only in local.properties.
+ai.demo.mode=true
+ai.provider=vivo
+ai.fallback.provider=mock
+ai.api.key=YOUR_API_KEY_HERE
+ai.base.url=https://api-ai.vivo.com.cn/v1
+ai.model=Doubao-Seed-2.0-pro
+
+# Optional DeepSeek-compatible settings for local testing only:
+# ai.provider=deepseek
+# ai.base.url=https://api.deepseek.com
+# ai.model=deepseek-chat

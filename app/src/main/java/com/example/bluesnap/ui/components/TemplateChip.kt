@@ -13,6 +13,7 @@ data class Template(
 )
 
 val defaultTemplates = listOf(
+    Template("活动筹备", "🎯", "报名、分工、预算一屏管理"),
     Template("番茄钟", "🍅", "25分钟专注工作法"),
     Template("待办清单", "📝", "任务管理与追踪"),
     Template("备忘录", "📒", "快速记录与查找"),

@@ -1,0 +1,41 @@
+package com.example.bluesnap.ai
+
+import android.util.Log
+import com.example.bluesnap.data.AppPlan
+import com.example.bluesnap.data.ChatMessage
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+
+private const val FALLBACK_TAG = "FallbackAiService"
+
+class FallbackAiService(
+    private val primary: AiService,
+    private val fallback: AiService
+) : AiService {
+    override suspend fun chat(messages: List<ChatMessage>) =
+        runCatching { primary.chat(messages) }
+            .getOrElse {
+                Log.w(FALLBACK_TAG, "对话服务失败，切换 Mock", it)
+                fallback.chat(messages)
+            }
+
+    override fun chatStream(messages: List<ChatMessage>): Flow<String> =
+        primary.chatStream(messages).catch {
+            Log.w(FALLBACK_TAG, "流式服务失败，切换 Mock", it)
+            fallback.chatStream(messages).collect { content -> emit(content) }
+        }
+
+    override suspend fun generatePlan(chatHistory: List<ChatMessage>): AppPlan =
+        runCatching { primary.generatePlan(chatHistory) }
+            .getOrElse {
+                Log.w(FALLBACK_TAG, "方案生成失败，切换 Mock", it)
+                fallback.generatePlan(chatHistory)
+            }
+
+    override suspend fun generateHtml(plan: AppPlan, chatHistory: List<ChatMessage>): String =
+        runCatching { primary.generateHtml(plan, chatHistory) }
+            .getOrElse {
+                Log.w(FALLBACK_TAG, "HTML 生成失败，切换 Mock", it)
+                fallback.generateHtml(plan, chatHistory)
+            }
+}
