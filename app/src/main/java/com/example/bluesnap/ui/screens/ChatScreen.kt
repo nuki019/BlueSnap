@@ -15,6 +15,8 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.bluesnap.data.ChatMessage
@@ -35,6 +37,13 @@ fun ChatScreen(
 ) {
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
+    val density = LocalDensity.current
+    val imeBottom = WindowInsets.ime.getBottom(density)
+    val navigationBottom = WindowInsets.navigationBars.getBottom(density)
+    val bottomInset = with(density) { maxOf(imeBottom, navigationBottom).toDp() }
+    var inputBarHeightPx by remember { mutableIntStateOf(0) }
+    val inputBarHeight = with(density) { inputBarHeightPx.toDp() }
+    val messageBottomPadding = inputBarHeight + bottomInset + 12.dp
 
     // 自动滚动到底部（包括流式输出时）
     LaunchedEffect(messages.size, isGenerating, streamingContent.length) {
@@ -91,7 +100,7 @@ fun ChatScreen(
                 // 底部留出输入栏高度的空间，避免最后一条消息被遮挡
                 contentPadding = PaddingValues(
                     top = 12.dp,
-                    bottom = 72.dp
+                    bottom = messageBottomPadding
                 )
             ) {
                 items(messages, key = { it.id }) { message ->
@@ -155,20 +164,21 @@ fun ChatScreen(
             }
         }
 
-        // ── 输入栏：浮层，固定在底部，imePadding 仅作用于此 ──
+        // ── 输入栏：浮层，底部 inset 只计算一次，避免被键盘重复顶起 ──
         Surface(
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 8.dp,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .imePadding()
+                .padding(bottom = bottomInset)
         ) {
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .onGloballyPositioned { inputBarHeightPx = it.size.height }
                     .padding(horizontal = 12.dp, vertical = 8.dp)
-                    .navigationBarsPadding(),
+                    .padding(bottom = 8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 OutlinedTextField(
