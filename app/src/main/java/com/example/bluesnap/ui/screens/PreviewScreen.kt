@@ -181,7 +181,7 @@ fun PreviewScreen(
                 PreviewActionRow(
                     icon = { Icon(Icons.Filled.Share, contentDescription = null) },
                     title = "系统分享 HTML",
-                    subtitle = "通过系统分享给同学或评委",
+                    subtitle = "通过系统分享给同学或伙伴",
                     onClick = {
                         shareHtml(context, app)
                         showActions = false

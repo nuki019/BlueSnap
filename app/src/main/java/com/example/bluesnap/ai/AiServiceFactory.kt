@@ -7,6 +7,25 @@ private const val FACTORY_TAG = "AiServiceFactory"
 
 object AiServiceFactory {
     fun create(): AiService {
+        return create(buildPrimaryConfig(), buildBuildConfigFallback())
+    }
+
+    fun create(fallbackConfig: AiConfig?): AiService {
+        return create(buildPrimaryConfig(), fallbackConfig ?: buildBuildConfigFallback())
+    }
+
+    fun create(primaryConfig: AiConfig, fallbackConfig: AiConfig?): AiService {
+        val primary = serviceFor(primaryConfig)
+        val fallback = serviceFor(fallbackConfig)
+        val safeFallback = if (fallback is MockAiService) fallback else FallbackAiService(fallback, MockAiService())
+        return if (primary is MockAiService) {
+            safeFallback
+        } else {
+            FallbackAiService(primary, safeFallback)
+        }
+    }
+
+    private fun buildPrimaryConfig(): AiConfig {
         val config = AiConfig(
             provider = BuildConfig.AI_PROVIDER.trim().lowercase(),
             fallbackProvider = BuildConfig.AI_FALLBACK_PROVIDER.trim().lowercase(),
@@ -18,17 +37,16 @@ object AiServiceFactory {
 
         if (config.demoMode || !config.hasUsableKey) {
             Log.i(FACTORY_TAG, "使用演示模式 AI 服务")
-            return MockAiService()
+            return config.copy(provider = "mock")
         }
 
-        val primary = serviceFor(config)
-        val fallback = fallbackService(config)
-        return if (primary is MockAiService) primary else FallbackAiService(primary, fallback)
+        return config
     }
 
-    private fun serviceFor(config: AiConfig): AiService {
-        return when (config.provider) {
-            "vivo", "deepseek" -> RealAiService(config)
+    private fun serviceFor(config: AiConfig?): AiService {
+        if (config == null || config.demoMode || !config.hasUsableKey) return MockAiService()
+        return when (config.provider.lowercase()) {
+            "vivo", "deepseek", "glm", "qwen", "kimi", "mimo" -> RealAiService(config)
             "mock" -> MockAiService()
             else -> {
                 Log.w(FACTORY_TAG, "未知 AI provider=${config.provider}，使用 Mock")
@@ -37,11 +55,11 @@ object AiServiceFactory {
         }
     }
 
-    private fun fallbackService(primaryConfig: AiConfig): AiService {
-        return when (primaryConfig.fallbackProvider) {
-            "", "mock" -> MockAiService()
+    private fun buildBuildConfigFallback(): AiConfig? {
+        return when (BuildConfig.AI_FALLBACK_PROVIDER.trim().lowercase()) {
+            "", "mock" -> null
             "deepseek" -> {
-                val fallbackConfig = AiConfig(
+                AiConfig(
                     provider = "deepseek",
                     fallbackProvider = "mock",
                     demoMode = false,
@@ -49,13 +67,11 @@ object AiServiceFactory {
                     baseUrl = BuildConfig.AI_FALLBACK_BASE_URL.trim().trimEnd('/'),
                     model = BuildConfig.AI_FALLBACK_MODEL.trim()
                 )
-                if (fallbackConfig.hasUsableKey) RealAiService(fallbackConfig) else MockAiService()
             }
             "vivo" -> {
-                val fallbackConfig = primaryConfig.copy(provider = "vivo", fallbackProvider = "mock")
-                if (fallbackConfig.hasUsableKey) RealAiService(fallbackConfig) else MockAiService()
+                buildPrimaryConfig().copy(provider = "vivo", fallbackProvider = "mock")
             }
-            else -> MockAiService()
+            else -> null
         }
     }
 }

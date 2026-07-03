@@ -209,7 +209,7 @@ private fun buildCodeLines(
     val cursor = ".".repeat((tick % 3) + 1)
     val base = mutableListOf(
         "> provider = $providerLabel",
-        "> protocol = Chat Completions",
+        "> mode = compatible generation",
         "> stage = ${stage.label.ifBlank { "等待确认" }}$cursor"
     )
     val recentLogs = logs.takeLast(6).map { "> $it" }

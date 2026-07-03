@@ -7,14 +7,16 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.bluesnap.BuildConfig
 import com.example.bluesnap.ai.AiConfig
-import com.example.bluesnap.ai.AiService
 import com.example.bluesnap.ai.AiServiceFactory
+import com.example.bluesnap.ai.ModelCredentialStore
 import com.example.bluesnap.data.AppPlan
 import com.example.bluesnap.data.AppState
 import com.example.bluesnap.data.ChatMessage
 import com.example.bluesnap.data.DEFAULT_SYSTEM_PROMPT
 import com.example.bluesnap.data.GeneratedApp
 import com.example.bluesnap.data.GenerationStage
+import com.example.bluesnap.data.ModelPreset
+import com.example.bluesnap.data.ModelPresets
 import com.example.bluesnap.data.Role
 import com.example.bluesnap.data.Screen
 import com.example.bluesnap.data.ThemeMode
@@ -27,8 +29,8 @@ import kotlinx.coroutines.launch
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
-    private val aiService: AiService = AiServiceFactory.create()
     private val prefs = application.getSharedPreferences("bluesnap_settings", Context.MODE_PRIVATE)
+    private val modelCredentialStore = ModelCredentialStore(application)
     private val notifier = GenerationNotifier(application)
 
     private val _state = MutableStateFlow(
@@ -36,7 +38,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             themeMode = loadThemeMode(),
             systemPrompt = prefs.getString(KEY_SYSTEM_PROMPT, DEFAULT_SYSTEM_PROMPT) ?: DEFAULT_SYSTEM_PROMPT,
             activeProviderLabel = providerLabel(),
-            apiKeyModeLabel = apiKeyModeLabel()
+            apiKeyModeLabel = apiKeyModeLabel(),
+            fallbackModelPresetId = modelCredentialStore.load()?.presetId,
+            fallbackModelLabel = fallbackModelLabel(),
+            fallbackModelKeyLabel = fallbackModelKeyLabel()
         )
     )
     val state: StateFlow<AppState> = _state.asStateFlow()
@@ -59,7 +64,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                aiService.chatStream(_state.value.messages).collect { partialContent ->
+                currentAiService().chatStream(_state.value.messages).collect { partialContent ->
                     _state.update { it.copy(streamingContent = partialContent) }
                 }
 
@@ -109,7 +114,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 )
             }
             try {
-                val plan = aiService.generatePlan(_state.value.messages, _state.value.systemPrompt)
+                val plan = currentAiService().generatePlan(_state.value.messages, _state.value.systemPrompt)
                 _state.update {
                     it.copy(
                         currentPlan = plan,
@@ -168,12 +173,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         generationStage = GenerationStage.BUILDING,
                         generationLogs = listOf(
                             "锁定已选功能，准备生成单文件 HTML",
-                            "发送 Chat Completions 请求到 ${providerLabel()}",
+                            "发送生成请求到 ${providerLabel()}",
                             "后台生成继续运行，可切出应用等待通知"
                         )
                     )
                 }
-                val bundle = aiService.generateBundle(plan, _state.value.messages, _state.value.systemPrompt)
+                val bundle = currentAiService().generateBundle(plan, _state.value.messages, _state.value.systemPrompt)
                 _state.update {
                     it.copy(
                         generationStage = GenerationStage.CHECKING,
@@ -306,6 +311,44 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(systemPrompt = value) }
     }
 
+    fun saveFallbackModel(presetId: String, apiKey: String) {
+        val preset = ModelPresets.find(presetId) ?: return
+        if (apiKey.isBlank()) return
+        modelCredentialStore.save(preset, apiKey)
+        refreshModelStatus()
+    }
+
+    private fun currentAiService() =
+        AiServiceFactory.create(runtimeFallbackConfig())
+
+    private fun runtimeFallbackConfig(): AiConfig? {
+        val saved = modelCredentialStore.load() ?: return null
+        val preset = saved.preset ?: return null
+        val key = modelCredentialStore.loadApiKey()
+        if (key.isBlank()) return null
+        return AiConfig(
+            provider = preset.provider,
+            fallbackProvider = "mock",
+            demoMode = false,
+            apiKey = key,
+            baseUrl = preset.baseUrl,
+            model = preset.modelId,
+            authMode = preset.authMode
+        )
+    }
+
+    private fun refreshModelStatus() {
+        _state.update {
+            it.copy(
+                activeProviderLabel = providerLabel(),
+                apiKeyModeLabel = apiKeyModeLabel(),
+                fallbackModelPresetId = modelCredentialStore.load()?.presetId,
+                fallbackModelLabel = fallbackModelLabel(),
+                fallbackModelKeyLabel = fallbackModelKeyLabel()
+            )
+        }
+    }
+
     private fun shouldAutoPlan(aiReply: String): Boolean {
         val triggers = listOf("方案", "规划好", "已经理解", "功能清单", "确认后即可生成", "可以查看方案")
         return triggers.any { aiReply.contains(it) }
@@ -337,6 +380,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (config.demoMode || !config.hasUsableKey) return "离线 Demo"
         return when (config.provider.lowercase()) {
             "deepseek" -> "DeepSeek"
+            "glm" -> "GLM"
+            "qwen" -> "Qwen"
+            "kimi" -> "Kimi"
+            "mimo" -> "MiMo"
             "mock" -> "离线 Demo"
             else -> "蓝心大模型"
         }
@@ -351,12 +398,22 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             baseUrl = BuildConfig.AI_BASE_URL,
             model = BuildConfig.AI_MODEL
         )
-        val fallback = BuildConfig.AI_FALLBACK_PROVIDER.trim().ifBlank { "mock" }
         return when {
-            config.demoMode -> "当前运行模式：离线 Demo，不使用真实 key。"
-            config.hasUsableKey -> "当前运行模式：联网生成；参赛 AppKey 已通过构建配置注入；失败后兜底：$fallback。"
-            else -> "当前运行模式：未配置可用 key，将自动使用 Mock 兜底。"
+            config.demoMode -> "当前为离线演示模式，可使用内置模板生成。"
+            config.hasUsableKey -> "当前主模型可用于联网生成；失败时自动切换备用模型。"
+            else -> "当前未连接主模型，将使用备用模型或离线模板。"
         }
+    }
+
+    private fun fallbackModelLabel(): String {
+        val saved = modelCredentialStore.load()
+        val preset: ModelPreset? = saved?.preset
+        return preset?.displayName ?: "DeepSeek（备用）"
+    }
+
+    private fun fallbackModelKeyLabel(): String {
+        val saved = modelCredentialStore.load()
+        return if (saved?.hasKey == true) "已保存：***" else "未保存备用模型 Key"
     }
 
     companion object {

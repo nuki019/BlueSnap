@@ -74,6 +74,9 @@ data class AppState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val systemPrompt: String = DEFAULT_SYSTEM_PROMPT,
     val activeProviderLabel: String = "蓝心大模型",
-    val apiKeyModeLabel: String = "参赛 AppKey 已通过构建配置注入",
+    val apiKeyModeLabel: String = "已连接默认模型服务",
+    val fallbackModelPresetId: String? = null,
+    val fallbackModelLabel: String = "DeepSeek（备用）",
+    val fallbackModelKeyLabel: String = "未保存备用模型 Key",
     val isAppInForeground: Boolean = true
 )

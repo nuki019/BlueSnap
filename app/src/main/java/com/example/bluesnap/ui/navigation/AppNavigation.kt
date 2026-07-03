@@ -91,8 +91,12 @@ fun AppNavigation(viewModel: MainViewModel) {
                     systemPrompt = state.systemPrompt,
                     activeProviderLabel = state.activeProviderLabel,
                     apiKeyModeLabel = state.apiKeyModeLabel,
+                    fallbackModelPresetId = state.fallbackModelPresetId,
+                    fallbackModelLabel = state.fallbackModelLabel,
+                    fallbackModelKeyLabel = state.fallbackModelKeyLabel,
                     onThemeModeChange = { viewModel.updateThemeMode(it) },
                     onSystemPromptChange = { viewModel.updateSystemPrompt(it) },
+                    onSaveFallbackModel = { presetId, apiKey -> viewModel.saveFallbackModel(presetId, apiKey) },
                     onBackHome = { viewModel.navigateTo(Screen.HOME) }
                 )
 

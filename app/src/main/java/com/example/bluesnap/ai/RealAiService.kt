@@ -6,6 +6,7 @@ import com.example.bluesnap.data.ChatMessage
 import com.example.bluesnap.data.DEFAULT_SYSTEM_PROMPT
 import com.example.bluesnap.data.Feature
 import com.example.bluesnap.data.GenerationBundle
+import com.example.bluesnap.data.ModelAuthMode
 import com.example.bluesnap.data.Role
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -188,10 +189,16 @@ class RealAiService(
     }
 
     private fun buildRequest(body: JSONObject, stream: Boolean): Request {
-        return Request.Builder()
+        val builder = Request.Builder()
             .url(buildChatUrl(UUID.randomUUID().toString()))
             .addHeader("Content-Type", "application/json; charset=utf-8")
-            .addHeader("Authorization", "Bearer ${config.apiKey}")
+
+        when (config.authMode) {
+            ModelAuthMode.BEARER -> builder.addHeader("Authorization", "Bearer ${config.apiKey}")
+            ModelAuthMode.API_KEY -> builder.addHeader("api-key", config.apiKey)
+        }
+
+        return builder
             .post(body.toString().toRequestBody(jsonType))
             .build()
     }

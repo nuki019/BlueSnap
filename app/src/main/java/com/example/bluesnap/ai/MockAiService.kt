@@ -370,7 +370,7 @@ function seed(){return {id:1,title:'校园效率工具设计',note:'从用户痛
     {id:7,title:'方案可控',note:'先确认功能，再生成',children:[]},
     {id:8,title:'结果分享',note:'导出和系统分享 HTML',children:[]}
   ]},
-  {id:4,title:'答辩亮点',note:'轻量、速度快、隐私边界清楚',children:[]}
+  {id:4,title:'产品亮点',note:'轻量、速度快、隐私边界清楚',children:[]}
 ]}}
 let root=load();
 function load(){try{return JSON.parse(localStorage.getItem(storeKey))||seed()}catch(e){return seed()}}
