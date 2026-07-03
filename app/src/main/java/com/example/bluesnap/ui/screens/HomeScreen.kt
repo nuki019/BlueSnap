@@ -62,6 +62,7 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(pageBackground)
+            .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 18.dp)
     ) {
@@ -79,7 +80,7 @@ fun HomeScreen(
         ) {
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
-                    text = "????????",
+                    text = "描述一个临时需求",
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                     color = MaterialTheme.colorScheme.onSurface
                 )
@@ -90,7 +91,7 @@ fun HomeScreen(
                     modifier = Modifier.fillMaxWidth(),
                     placeholder = {
                         Text(
-                            "????????????????",
+                            "例如：帮我做一个快捷思维导图应用",
                             style = MaterialTheme.typography.bodyMedium
                         )
                     },
@@ -112,7 +113,7 @@ fun HomeScreen(
                         modifier = Modifier.size(18.dp)
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text("????", style = MaterialTheme.typography.labelLarge)
+                    Text("开始生成", style = MaterialTheme.typography.labelLarge)
                 }
             }
         }
@@ -120,14 +121,14 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(20.dp))
 
         Text(
-            text = "????",
+            text = "校园场景",
             style = MaterialTheme.typography.titleMedium.copy(
                 fontWeight = FontWeight.SemiBold
             ),
             modifier = Modifier.padding(start = 2.dp, bottom = 4.dp)
         )
         Text(
-            text = "????????????????????",
+            text = "从一个具体需求开始，生成刚好够用的小工具",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.58f),
             modifier = Modifier.padding(start = 2.dp, bottom = 12.dp)
@@ -163,7 +164,7 @@ fun HomeScreen(
         Spacer(modifier = Modifier.height(18.dp))
 
         Text(
-            text = "?????",
+            text = "更多轻工具",
             style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(start = 2.dp, bottom = 8.dp)
         )
@@ -210,7 +211,7 @@ fun HomeScreen(
         }
 
         Text(
-            text = "?? vivo ????? ? Demo-safe ???????",
+            text = "基于 vivo 蓝心大模型 · Demo-safe 模式可离线演示",
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f),
             textAlign = TextAlign.Center,
@@ -218,6 +219,8 @@ fun HomeScreen(
                 .fillMaxWidth()
                 .padding(top = 18.dp, bottom = 24.dp)
         )
+
+        Spacer(modifier = Modifier.height(110.dp))
     }
 }
 
@@ -250,13 +253,13 @@ private fun HeroPanel() {
             }
             Spacer(modifier = Modifier.height(12.dp))
             Text(
-                text = "????",
+                text = "蓝心快搭",
                 style = MaterialTheme.typography.headlineMedium.copy(fontWeight = FontWeight.Bold),
                 color = Color.White
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "??????????????????????????????????",
+                text = "一句话，把校园里的临时需求变成手机里可运行、可保存、可分享的轻工具。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = Color.White.copy(alpha = 0.78f),
                 modifier = Modifier.widthIn(max = 230.dp)
@@ -304,28 +307,28 @@ private fun DecorativeStack(modifier: Modifier = Modifier) {
 
 private fun campusScenarios(): List<Template> = listOf(
     Template(
-        name = "????",
+        name = "活动筹备",
         icon = Icons.Filled.EventAvailable,
-        description = "???????????",
-        prompt = "???????????????????????????????"
+        description = "报名、分工、预算、进度",
+        prompt = "帮我做一个校园活动筹备工具，要能记录报名、任务分工、预算和进度"
     ),
     Template(
-        name = "????",
+        name = "课程协作",
         icon = Icons.Filled.School,
-        description = "?? DDL ?????",
-        prompt = "?????????????????? DDL??????????"
+        description = "作业 DDL 和小组进度",
+        prompt = "帮我做一个课程协作工具，要能记录作业 DDL、小组任务和完成状态"
     ),
     Template(
-        name = "????",
+        name = "求职实习",
         icon = Icons.Filled.WorkOutline,
-        description = "??????????",
-        prompt = "???????????????????????????????"
+        description = "投递、面试、反馈跟进",
+        prompt = "帮我做一个求职实习投递表，能记录公司、岗位、投递状态和面试安排"
     ),
     Template(
-        name = "????",
+        name = "生活管理",
         icon = Icons.Filled.Savings,
-        description = "??????????",
-        prompt = "???????????????????????????"
+        description = "预算、习惯、日常记录",
+        prompt = "帮我做一个生活预算工具，能记录支出、分类和本月剩余额度"
     )
 )
 

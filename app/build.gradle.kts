@@ -5,14 +5,19 @@ plugins {
     alias(libs.plugins.kotlin.compose)
 }
 
-// ? local.properties ?? API ???Key ????
+// 从 local.properties 读取 API 配置（Key 不入库）
 val localProps = Properties().apply {
     val f = rootProject.file("local.properties")
     if (f.exists()) load(f.inputStream())
 }
 
-fun prop(name: String, default: String): String =
-    localProps.getProperty(name, default)
+fun prop(name: String, default: String): String {
+    val envName = name.uppercase().replace(".", "_")
+    val prefixedEnvName = "BLUESNAP_$envName"
+    return System.getenv(prefixedEnvName)
+        ?: System.getenv(envName)
+        ?: localProps.getProperty(name, default)
+}
 
 fun quotedBuildConfig(value: String): String =
     "\"" + value
@@ -42,6 +47,9 @@ android {
         buildConfigField("String", "AI_API_KEY", quotedBuildConfig(prop("ai.api.key", "YOUR_API_KEY_HERE")))
         buildConfigField("String", "AI_BASE_URL", quotedBuildConfig(prop("ai.base.url", "https://api-ai.vivo.com.cn/v1")))
         buildConfigField("String", "AI_MODEL", quotedBuildConfig(prop("ai.model", "Doubao-Seed-2.0-pro")))
+        buildConfigField("String", "AI_FALLBACK_API_KEY", quotedBuildConfig(prop("ai.fallback.api.key", "")))
+        buildConfigField("String", "AI_FALLBACK_BASE_URL", quotedBuildConfig(prop("ai.fallback.base.url", "https://api.deepseek.com")))
+        buildConfigField("String", "AI_FALLBACK_MODEL", quotedBuildConfig(prop("ai.fallback.model", "deepseek-chat")))
     }
 
     buildTypes {
@@ -51,6 +59,11 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+        }
+        create("contestDemo") {
+            initWith(getByName("release"))
+            matchingFallbacks += listOf("release")
+            isDebuggable = false
         }
     }
     compileOptions {

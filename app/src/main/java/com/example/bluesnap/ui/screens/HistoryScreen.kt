@@ -76,11 +76,11 @@ fun HistoryScreen(
             Spacer(modifier = Modifier.width(12.dp))
             Column {
                 Text(
-                    text = "????",
+                    text = "历史记录",
                     style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
                 )
                 Text(
-                    text = "?????????????",
+                    text = "保存本次会话生成过的轻工具",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f)
                 )
@@ -124,12 +124,12 @@ private fun EmptyHistoryState(onCreate: () -> Unit) {
             )
             Spacer(modifier = Modifier.height(14.dp))
             Text(
-                text = "???????",
+                text = "还没有生成记录",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
             )
             Spacer(modifier = Modifier.height(6.dp))
             Text(
-                text = "???? HTML ????????????????????",
+                text = "生成后的 HTML 轻工具会出现在这里，方便再次打开或分享。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f)
             )
@@ -137,7 +137,7 @@ private fun EmptyHistoryState(onCreate: () -> Unit) {
             Button(onClick = onCreate, shape = RoundedCornerShape(12.dp)) {
                 Icon(Icons.Filled.AddCircleOutline, contentDescription = null, modifier = Modifier.size(18.dp))
                 Spacer(modifier = Modifier.width(8.dp))
-                Text("????")
+                Text("创造作品")
             }
         }
     }
@@ -205,7 +205,7 @@ private fun HistoryAppCard(
                 ) {
                     Icon(Icons.Filled.OpenInNew, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("??")
+                    Text("打开")
                 }
                 OutlinedButton(
                     onClick = onShare,
@@ -214,10 +214,10 @@ private fun HistoryAppCard(
                 ) {
                     Icon(Icons.Filled.IosShare, contentDescription = null, modifier = Modifier.size(18.dp))
                     Spacer(modifier = Modifier.width(6.dp))
-                    Text("??")
+                    Text("分享")
                 }
                 IconButton(onClick = onDelete) {
-                    Icon(Icons.Filled.DeleteOutline, contentDescription = "??")
+                    Icon(Icons.Filled.DeleteOutline, contentDescription = "删除")
                 }
             }
         }
@@ -225,5 +225,5 @@ private fun HistoryAppCard(
 }
 
 private fun formatHistoryTime(timestamp: Long): String {
-    return SimpleDateFormat("MM?dd? HH:mm", Locale.CHINA).format(Date(timestamp))
+    return SimpleDateFormat("MM月dd日 HH:mm", Locale.CHINA).format(Date(timestamp))
 }

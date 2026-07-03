@@ -24,7 +24,7 @@ fun PlanCard(
     modifier: Modifier = Modifier
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        // ???????
+        // 应用名称与描述
         Text(
             text = plan.name,
             style = MaterialTheme.typography.headlineSmall.copy(
@@ -39,9 +39,9 @@ fun PlanCard(
             modifier = Modifier.padding(top = 4.dp, bottom = 16.dp)
         )
 
-        // ????
+        // 功能清单
         Text(
-            text = "????",
+            text = "功能清单",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(bottom = 8.dp)
         )
@@ -87,9 +87,9 @@ fun PlanCard(
             }
         }
 
-        // ??????
+        // 布局方案选择
         Text(
-            text = "????",
+            text = "界面风格",
             style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
             modifier = Modifier.padding(top = 20.dp, bottom = 8.dp)
         )
@@ -129,7 +129,7 @@ fun PlanCard(
             }
         }
 
-        // ??????
+        // 预期效果说明
         Card(
             modifier = Modifier
                 .fillMaxWidth()
@@ -147,7 +147,7 @@ fun PlanCard(
                     modifier = Modifier.size(20.dp)
                 )
                 Text(
-                    text = "?????????? HTML ??????????????",
+                    text = "确认后将生成完整的单 HTML 应用，可在内置沙箱中直接运行",
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f),
                     modifier = Modifier.padding(start = 8.dp)

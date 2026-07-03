@@ -13,25 +13,64 @@ import android.webkit.WebViewClient
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Feedback
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.Upgrade
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExtendedFloatingActionButton
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ListItem
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.bluesnap.BuildConfig
 import com.example.bluesnap.data.GeneratedApp
+import com.example.bluesnap.data.GenerationStage
 import java.io.ByteArrayInputStream
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -39,14 +78,18 @@ import java.io.ByteArrayInputStream
 fun PreviewScreen(
     app: GeneratedApp?,
     isGenerating: Boolean,
+    generationStage: GenerationStage,
     onFeedback: (String) -> Unit,
     onSharePage: () -> Unit,
     onBack: () -> Unit
 ) {
     var feedbackText by remember { mutableStateOf("") }
+    var showActions by remember { mutableStateOf(false) }
+    var reloadToken by remember { mutableIntStateOf(0) }
+    var pendingExportApp by remember { mutableStateOf<GeneratedApp?>(null) }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
-    var pendingExportApp by remember { mutableStateOf<GeneratedApp?>(null) }
+    val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/html")
     ) { uri ->
@@ -57,129 +100,237 @@ fun PreviewScreen(
         }
     }
 
-    Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        // ?????
-        TopAppBar(
-            title = {
-                Text(
-                    app?.name ?: "??",
-                    style = MaterialTheme.typography.titleMedium
-                )
-            },
-            actions = {
-                if (app != null) {
-                    TextButton(
-                        onClick = {
-                            pendingExportApp = app
-                            exportLauncher.launch("${safeHtmlFileName(app.name)}.html")
-                        }
-                    ) {
-                        Text("??")
-                    }
-                    IconButton(onClick = { shareHtml(context, app) }) {
-                        Icon(Icons.Filled.Share, contentDescription = "?? HTML")
-                    }
-                    TextButton(onClick = onSharePage) {
-                        Text("????")
-                    }
-                }
-            },
-            navigationIcon = {
-                IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "??")
-                }
-            },
-            colors = TopAppBarDefaults.topAppBarColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+    Box(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
+        when {
+            app == null -> EmptyPreviewState(onBack = onBack)
+            isGenerating -> GeneratingPreview(stage = generationStage)
+            else -> AppWebView(app = app, reloadToken = reloadToken)
+        }
+
+        PreviewTitlePill(
+            title = app?.name ?: "预览",
+            onBack = onBack,
+            modifier = Modifier
+                .align(Alignment.TopStart)
+                .statusBarsPadding()
+                .padding(start = 12.dp, top = 10.dp)
         )
 
-        HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
-
-        if (app == null) {
-            Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                Text("?????????", color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f))
-            }
-        } else {
-            // WebView ???
-            Box(
+        if (app != null) {
+            ExtendedFloatingActionButton(
+                onClick = { showActions = true },
                 modifier = Modifier
-                    .weight(1f)
+                    .align(Alignment.BottomEnd)
+                    .navigationBarsPadding()
+                    .padding(end = 16.dp, bottom = 18.dp),
+                icon = { Icon(Icons.Filled.MoreVert, contentDescription = null) },
+                text = { Text("操作") },
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
+        }
+    }
+
+    if (showActions && app != null) {
+        ModalBottomSheet(
+            onDismissRequest = { showActions = false },
+            sheetState = sheetState
+        ) {
+            Column(
+                modifier = Modifier
                     .fillMaxWidth()
-                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .navigationBarsPadding()
+                    .padding(horizontal = 18.dp, vertical = 6.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                if (isGenerating) {
-                    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                            Spacer(modifier = Modifier.height(16.dp))
+                Text(
+                    text = app.name,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+                )
+                Text(
+                    text = "生成结果以本地 HTML 方式运行，外链和外部资源会被 WebView 沙箱拦截。",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f)
+                )
+                Spacer(modifier = Modifier.height(6.dp))
+                PreviewActionRow(
+                    icon = { Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = null) },
+                    title = "返回",
+                    subtitle = "回到上一页继续调整",
+                    onClick = {
+                        showActions = false
+                        onBack()
+                    }
+                )
+                PreviewActionRow(
+                    icon = { Icon(Icons.Filled.Refresh, contentDescription = null) },
+                    title = "重载预览",
+                    subtitle = "重新加载当前 HTML",
+                    onClick = {
+                        reloadToken++
+                        showActions = false
+                    }
+                )
+                PreviewActionRow(
+                    icon = { Icon(Icons.Filled.FileDownload, contentDescription = null) },
+                    title = "导出 HTML",
+                    subtitle = "保存为单文件，可离线打开",
+                    onClick = {
+                        pendingExportApp = app
+                        exportLauncher.launch("${safeHtmlFileName(app.name)}.html")
+                        showActions = false
+                    }
+                )
+                PreviewActionRow(
+                    icon = { Icon(Icons.Filled.Share, contentDescription = null) },
+                    title = "系统分享 HTML",
+                    subtitle = "通过系统分享给同学或评委",
+                    onClick = {
+                        shareHtml(context, app)
+                        showActions = false
+                    }
+                )
+                PreviewActionRow(
+                    icon = { Icon(Icons.Filled.Upgrade, contentDescription = null) },
+                    title = "分享成果页",
+                    subtitle = "查看生成摘要和媒体增强建议",
+                    onClick = {
+                        showActions = false
+                        onSharePage()
+                    }
+                )
+                Surface(
+                    shape = RoundedCornerShape(16.dp),
+                    color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.55f)
+                ) {
+                    Column(modifier = Modifier.padding(12.dp)) {
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            Icon(Icons.Filled.Feedback, contentDescription = null, tint = MaterialTheme.colorScheme.primary)
+                            Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                "??????...",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                                text = "反馈修改",
+                                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold)
                             )
                         }
-                    }
-                } else {
-                    AppWebView(app = app)
-                }
-            }
-
-            // ???????
-            Surface(
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 4.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 12.dp, vertical = 8.dp)
-                        .navigationBarsPadding(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    OutlinedTextField(
-                        value = feedbackText,
-                        onValueChange = { feedbackText = it },
-                        modifier = Modifier.weight(1f),
-                        placeholder = { Text("????????????...") },
-                        shape = RoundedCornerShape(24.dp),
-                        singleLine = true,
-                        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
-                        keyboardActions = KeyboardActions(onSend = {
-                            if (feedbackText.isNotBlank()) {
-                                onFeedback(feedbackText)
-                                feedbackText = ""
-                                focusManager.clearFocus()
+                        Spacer(modifier = Modifier.height(8.dp))
+                        Row(verticalAlignment = Alignment.CenterVertically) {
+                            OutlinedTextField(
+                                value = feedbackText,
+                                onValueChange = { feedbackText = it },
+                                modifier = Modifier.weight(1f),
+                                placeholder = { Text("例如：把按钮改小一点，增加导出文本") },
+                                shape = RoundedCornerShape(18.dp),
+                                singleLine = true,
+                                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
+                                keyboardActions = KeyboardActions(onSend = {
+                                    if (feedbackText.isNotBlank()) {
+                                        onFeedback(feedbackText)
+                                        feedbackText = ""
+                                        focusManager.clearFocus()
+                                        showActions = false
+                                    }
+                                })
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            FilledIconButton(
+                                onClick = {
+                                    if (feedbackText.isNotBlank()) {
+                                        onFeedback(feedbackText)
+                                        feedbackText = ""
+                                        focusManager.clearFocus()
+                                        showActions = false
+                                    }
+                                },
+                                enabled = feedbackText.isNotBlank()
+                            ) {
+                                Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "发送反馈")
                             }
-                        }),
-                        colors = OutlinedTextFieldDefaults.colors(
-                            focusedBorderColor = MaterialTheme.colorScheme.primary,
-                            unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant
-                        )
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    FilledIconButton(
-                        onClick = {
-                            if (feedbackText.isNotBlank()) {
-                                onFeedback(feedbackText)
-                                feedbackText = ""
-                                focusManager.clearFocus()
-                            }
-                        },
-                        enabled = feedbackText.isNotBlank()
-                    ) {
-                        Icon(Icons.AutoMirrored.Filled.Send, contentDescription = "????")
+                        }
                     }
                 }
+                Spacer(modifier = Modifier.height(10.dp))
             }
         }
     }
 }
 
-/**
- * ??? WebView ?? JS ?????
- * ?? console.log / console.error / ???????? Android Logcat?
- */
+@Composable
+private fun PreviewTitlePill(
+    title: String,
+    onBack: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        shape = RoundedCornerShape(999.dp),
+        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
+        shadowElevation = 8.dp
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 4.dp, end = 14.dp, top = 4.dp, bottom = 4.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            IconButton(onClick = onBack, modifier = Modifier.size(38.dp)) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+            }
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+                maxLines = 1
+            )
+        }
+    }
+}
+
+@Composable
+private fun PreviewActionRow(
+    icon: @Composable () -> Unit,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit
+) {
+    ListItem(
+        headlineContent = { Text(title) },
+        supportingContent = { Text(subtitle) },
+        leadingContent = icon,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick)
+            .background(MaterialTheme.colorScheme.surface, RoundedCornerShape(14.dp))
+    )
+}
+
+@Composable
+private fun EmptyPreviewState(onBack: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            Text(
+                "请先生成一个应用",
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold)
+            )
+            Spacer(modifier = Modifier.height(12.dp))
+            Button(onClick = onBack, shape = RoundedCornerShape(12.dp)) {
+                Text("返回")
+            }
+        }
+    }
+}
+
+@Composable
+private fun GeneratingPreview(stage: GenerationStage) {
+    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+            Spacer(modifier = Modifier.height(16.dp))
+            Text(
+                stage.label.ifBlank { "正在生成应用" },
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.72f)
+            )
+        }
+    }
+}
+
 private const val DEBUG_JS_BRIDGE = """
 (function() {
     function sendToAndroid(level, args) {
@@ -208,7 +359,7 @@ private const val DEBUG_JS_BRIDGE = """
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-private fun AppWebView(app: GeneratedApp) {
+private fun AppWebView(app: GeneratedApp, reloadToken: Int) {
     val baseUrl = "https://${app.id}.localhost/"
     AndroidView(
         factory = { context ->
@@ -217,22 +368,7 @@ private fun AppWebView(app: GeneratedApp) {
                     ViewGroup.LayoutParams.MATCH_PARENT,
                     ViewGroup.LayoutParams.MATCH_PARENT
                 )
-                webViewClient = object : WebViewClient() {
-                    override fun shouldOverrideUrlLoading(
-                        view: WebView?,
-                        request: WebResourceRequest?
-                    ): Boolean {
-                        return !isAllowedWebViewUrl(request?.url)
-                    }
-
-                    override fun shouldInterceptRequest(
-                        view: WebView?,
-                        request: WebResourceRequest?
-                    ): WebResourceResponse? {
-                        val url = request?.url ?: return blockedResponse()
-                        return if (isAllowedWebViewUrl(url)) null else blockedResponse()
-                    }
-                }
+                webViewClient = sandboxWebViewClient()
                 webChromeClient = if (isWebDebugEnabled()) {
                     object : WebChromeClient() {
                         override fun onConsoleMessage(consoleMessage: ConsoleMessage?): Boolean {
@@ -260,9 +396,13 @@ private fun AppWebView(app: GeneratedApp) {
                     useWideViewPort = true
                     mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_NEVER_ALLOW
                 }
-                // ?? https://localhost ?? base URL?? WebView ????????
-                // ?? localStorage?sessionStorage ? API ??????
-                loadDataWithBaseURL(
+            }
+        },
+        update = { webView ->
+            val loadTag = "${app.id}-${app.htmlContent.hashCode()}-$reloadToken"
+            if (webView.tag != loadTag) {
+                webView.tag = loadTag
+                webView.loadDataWithBaseURL(
                     baseUrl,
                     wrapWithDebugBridgeIfNeeded(app.htmlContent),
                     "text/html",
@@ -271,32 +411,37 @@ private fun AppWebView(app: GeneratedApp) {
                 )
             }
         },
-        update = { webView ->
-            webView.loadDataWithBaseURL(
-                baseUrl,
-                wrapWithDebugBridgeIfNeeded(app.htmlContent),
-                "text/html",
-                "UTF-8",
-                null
-            )
-        },
         modifier = Modifier.fillMaxSize()
     )
 }
 
-/**
- * ? HTML ? <head> ?????????????? JS ???
- */
+private fun sandboxWebViewClient(): WebViewClient {
+    return object : WebViewClient() {
+        override fun shouldOverrideUrlLoading(
+            view: WebView?,
+            request: WebResourceRequest?
+        ): Boolean {
+            return !isAllowedWebViewUrl(request?.url)
+        }
+
+        override fun shouldInterceptRequest(
+            view: WebView?,
+            request: WebResourceRequest?
+        ): WebResourceResponse? {
+            val url = request?.url ?: return blockedResponse()
+            return if (isAllowedWebViewUrl(url)) null else blockedResponse()
+        }
+    }
+}
+
 private fun wrapWithDebugBridgeIfNeeded(html: String): String {
     if (!isWebDebugEnabled()) return html
-    // ?? HTML ?? </head>???????????
     val headCloseIndex = html.indexOf("</head>", ignoreCase = true)
     return if (headCloseIndex != -1) {
         html.substring(0, headCloseIndex) +
             "\n<script>$DEBUG_JS_BRIDGE</script>\n" +
             html.substring(headCloseIndex)
     } else {
-        // ?? </head> ??????????
         "<script>$DEBUG_JS_BRIDGE</script>$html"
     }
 }

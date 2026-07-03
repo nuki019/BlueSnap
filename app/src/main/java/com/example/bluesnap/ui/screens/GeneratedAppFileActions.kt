@@ -25,10 +25,10 @@ internal fun shareHtml(context: Context, app: GeneratedApp) {
             putExtra(Intent.EXTRA_SUBJECT, app.name)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "?? HTML"))
+        context.startActivity(Intent.createChooser(intent, "分享 HTML"))
     }.onFailure {
-        Log.e("GeneratedAppFileActions", "?? HTML ??", it)
-        Toast.makeText(context, "??????????", Toast.LENGTH_SHORT).show()
+        Log.e("GeneratedAppFileActions", "分享 HTML 失败", it)
+        Toast.makeText(context, "分享失败，请稍后重试", Toast.LENGTH_SHORT).show()
     }
 }
 
@@ -36,11 +36,11 @@ internal fun exportHtml(context: Context, uri: Uri, app: GeneratedApp) {
     runCatching {
         context.contentResolver.openOutputStream(uri)?.use { output ->
             output.write(app.htmlContent.toByteArray(Charsets.UTF_8))
-        } ?: error("????????")
-        Toast.makeText(context, "HTML ?????????", Toast.LENGTH_SHORT).show()
+        } ?: error("无法打开导出目标")
+        Toast.makeText(context, "HTML 已导出，可离线使用", Toast.LENGTH_SHORT).show()
     }.onFailure {
-        Log.e("GeneratedAppFileActions", "?? HTML ??", it)
-        Toast.makeText(context, "????????", Toast.LENGTH_SHORT).show()
+        Log.e("GeneratedAppFileActions", "导出 HTML 失败", it)
+        Toast.makeText(context, "导出失败，请重试", Toast.LENGTH_SHORT).show()
     }
 }
 

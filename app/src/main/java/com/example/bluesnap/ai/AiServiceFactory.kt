@@ -17,29 +17,45 @@ object AiServiceFactory {
         )
 
         if (config.demoMode || !config.hasUsableKey) {
-            Log.i(FACTORY_TAG, "?????? AI ??")
+            Log.i(FACTORY_TAG, "使用演示模式 AI 服务")
             return MockAiService()
         }
 
-        val primary = when (config.provider) {
+        val primary = serviceFor(config)
+        val fallback = fallbackService(config)
+        return if (primary is MockAiService) primary else FallbackAiService(primary, fallback)
+    }
+
+    private fun serviceFor(config: AiConfig): AiService {
+        return when (config.provider) {
             "vivo", "deepseek" -> RealAiService(config)
             "mock" -> MockAiService()
             else -> {
-                Log.w(FACTORY_TAG, "?? AI provider=${config.provider}??? Mock")
+                Log.w(FACTORY_TAG, "未知 AI provider=${config.provider}，使用 Mock")
                 MockAiService()
             }
         }
+    }
 
-        val fallback = when (config.fallbackProvider) {
-            "mock", "" -> MockAiService()
+    private fun fallbackService(primaryConfig: AiConfig): AiService {
+        return when (primaryConfig.fallbackProvider) {
+            "", "mock" -> MockAiService()
+            "deepseek" -> {
+                val fallbackConfig = AiConfig(
+                    provider = "deepseek",
+                    fallbackProvider = "mock",
+                    demoMode = false,
+                    apiKey = BuildConfig.AI_FALLBACK_API_KEY.trim(),
+                    baseUrl = BuildConfig.AI_FALLBACK_BASE_URL.trim().trimEnd('/'),
+                    model = BuildConfig.AI_FALLBACK_MODEL.trim()
+                )
+                if (fallbackConfig.hasUsableKey) RealAiService(fallbackConfig) else MockAiService()
+            }
+            "vivo" -> {
+                val fallbackConfig = primaryConfig.copy(provider = "vivo", fallbackProvider = "mock")
+                if (fallbackConfig.hasUsableKey) RealAiService(fallbackConfig) else MockAiService()
+            }
             else -> MockAiService()
-        }
-
-        return if (primary is MockAiService) {
-            primary
-        } else {
-            FallbackAiService(primary = primary, fallback = fallback)
         }
     }
 }
-

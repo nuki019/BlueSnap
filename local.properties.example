@@ -9,6 +9,10 @@ ai.base.url=https://api-ai.vivo.com.cn/v1
 ai.model=Doubao-Seed-2.0-pro
 
 # Optional DeepSeek-compatible settings for local testing only:
-# ai.provider=deepseek
-# ai.base.url=https://api.deepseek.com
-# ai.model=deepseek-chat
+# ai.fallback.provider=deepseek
+# ai.fallback.api.key=YOUR_LOCAL_DEEPSEEK_KEY
+# ai.fallback.base.url=https://api.deepseek.com
+# ai.fallback.model=deepseek-chat
+
+# You can also inject values at build time without editing this file:
+# BLUESNAP_AI_API_KEY, BLUESNAP_AI_DEMO_MODE, BLUESNAP_AI_PROVIDER, etc.

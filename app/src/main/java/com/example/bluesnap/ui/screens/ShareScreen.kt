@@ -74,10 +74,10 @@ fun ShareScreen(
 
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
         TopAppBar(
-            title = { Text("????", style = MaterialTheme.typography.titleMedium) },
+            title = { Text("分享成果", style = MaterialTheme.typography.titleMedium) },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "??")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -118,7 +118,7 @@ fun ShareScreen(
                         )
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "?????${formatCreatedAt(app.createdAt)}",
+                            text = "生成时间：${formatCreatedAt(app.createdAt)}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.58f)
                         )
@@ -133,14 +133,14 @@ fun ShareScreen(
                 ) {
                     Column(modifier = Modifier.padding(20.dp)) {
                         Text(
-                            text = "???????",
+                            text = "可保存、可流转",
                             style = MaterialTheme.typography.titleMedium.copy(
                                 fontWeight = FontWeight.SemiBold
                             )
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
-                            text = "???????? HTML ????????????????????????????????????",
+                            text = "生成结果会以单个 HTML 文件导出或通过系统分享给同学。文件可离线打开，不需要公网发布或云端托管。",
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.68f)
                         )
@@ -156,7 +156,7 @@ fun ShareScreen(
                     ) {
                         Column(modifier = Modifier.padding(20.dp)) {
                             Text(
-                                text = "??????",
+                                text = "媒体增强建议",
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -165,7 +165,7 @@ fun ShareScreen(
                             app.imagePrompt?.takeIf { it.isNotBlank() }?.let {
                                 MediaPromptRow(
                                     icon = Icons.Filled.Image,
-                                    label = "?????",
+                                    label = "插图提示词",
                                     content = it
                                 )
                             }
@@ -173,7 +173,7 @@ fun ShareScreen(
                                 Spacer(modifier = Modifier.height(10.dp))
                                 MediaPromptRow(
                                     icon = Icons.Filled.GraphicEq,
-                                    label = "?????",
+                                    label = "语音提示词",
                                     content = it
                                 )
                             }
@@ -202,7 +202,7 @@ fun ShareScreen(
                         shape = RoundedCornerShape(12.dp),
                         colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
-                        Text("?? HTML", style = MaterialTheme.typography.labelLarge)
+                        Text("导出 HTML", style = MaterialTheme.typography.labelLarge)
                     }
                     OutlinedButton(
                         onClick = { shareHtml(context, app) },
@@ -211,14 +211,14 @@ fun ShareScreen(
                     ) {
                         Icon(Icons.Filled.Share, contentDescription = null, modifier = Modifier.size(18.dp))
                         Spacer(modifier = Modifier.width(8.dp))
-                        Text("???? HTML", style = MaterialTheme.typography.labelLarge)
+                        Text("系统分享 HTML", style = MaterialTheme.typography.labelLarge)
                     }
                     OutlinedButton(
                         onClick = onBack,
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(12.dp)
                     ) {
-                        Text("??????", style = MaterialTheme.typography.labelLarge)
+                        Text("返回继续使用", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }
@@ -234,13 +234,13 @@ private fun EmptyShareState(onReturnHome: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
-                text = "?????????",
+                text = "请先生成一个轻工具",
                 style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.SemiBold),
                 textAlign = TextAlign.Center
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = "????????????? HTML ????????",
+                text = "生成完成后，可以在这里导出 HTML 或调用系统分享。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f),
                 textAlign = TextAlign.Center
@@ -250,7 +250,7 @@ private fun EmptyShareState(onReturnHome: () -> Unit) {
                 onClick = onReturnHome,
                 shape = RoundedCornerShape(12.dp)
             ) {
-                Text("????")
+                Text("返回首页")
             }
         }
     }

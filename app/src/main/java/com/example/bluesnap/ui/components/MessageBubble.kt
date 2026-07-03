@@ -45,9 +45,9 @@ fun MessageBubble(
         Column(
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            // ????
+            // 角色标签
             Text(
-                text = if (isUser) "?" else "????",
+                text = if (isUser) "你" else "蓝心快搭",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(
@@ -56,7 +56,7 @@ fun MessageBubble(
                     bottom = 2.dp
                 )
             )
-            // ????
+            // 气泡内容
             Text(
                 text = message.content,
                 modifier = Modifier

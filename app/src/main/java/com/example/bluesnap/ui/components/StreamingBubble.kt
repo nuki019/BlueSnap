@@ -20,7 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 /**
- * ?????? AI ?????????????????
+ * 流式输出中的 AI 气泡，带有动画省略号指示正在生成。
  */
 @Composable
 fun StreamingBubble(
@@ -49,14 +49,14 @@ fun StreamingBubble(
         Column(
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            // ????
+            // 角色标签
             Text(
-                text = "????",
+                text = "蓝心快搭",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(start = 4.dp, bottom = 2.dp)
             )
-            // ???? + ?????
+            // 气泡内容 + 动画省略号
             Column(
                 modifier = Modifier
                     .clip(shape)
@@ -71,9 +71,9 @@ fun StreamingBubble(
                     ),
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                // ??????????????
+                // 动画呼吸省略号，表示正在生成
                 Text(
-                    text = "???",
+                    text = "●●●",
                     style = MaterialTheme.typography.bodySmall.copy(
                         fontSize = 10.sp,
                         letterSpacing = 2.sp

@@ -19,14 +19,14 @@ secrets/
 # IDE
 .idea/
 
-# LaTeX ????
+# LaTeX 中间文件
 *.aux
 *.log
 *.out
 *.toc
 
-# ??? LaTeX ?????? .md ?????? PDF?
-???/proposal.aux
-???/proposal.log
-???/proposal.out
-???/proposal.toc
+# 策划案 LaTeX 生成物（保留 .md 源文件和最终 PDF）
+策划案/proposal.aux
+策划案/proposal.log
+策划案/proposal.out
+策划案/proposal.toc
