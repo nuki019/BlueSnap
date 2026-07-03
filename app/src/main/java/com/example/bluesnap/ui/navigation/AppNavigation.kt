@@ -89,15 +89,12 @@ fun AppNavigation(viewModel: MainViewModel) {
                 Screen.SETTINGS -> SettingsScreen(
                     themeMode = state.themeMode,
                     systemPrompt = state.systemPrompt,
-                    activeProviderLabel = state.activeProviderLabel,
-                    apiKeyModeLabel = state.apiKeyModeLabel,
                     fallbackModelPresetId = state.fallbackModelPresetId,
                     fallbackModelLabel = state.fallbackModelLabel,
                     fallbackModelKeyLabel = state.fallbackModelKeyLabel,
                     onThemeModeChange = { viewModel.updateThemeMode(it) },
                     onSystemPromptChange = { viewModel.updateSystemPrompt(it) },
-                    onSaveFallbackModel = { presetId, apiKey -> viewModel.saveFallbackModel(presetId, apiKey) },
-                    onBackHome = { viewModel.navigateTo(Screen.HOME) }
+                    onSaveFallbackModel = { presetId, apiKey -> viewModel.saveFallbackModel(presetId, apiKey) }
                 )
 
                 Screen.CHAT -> ChatScreen(

@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -42,6 +43,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.bluesnap.data.GeneratedApp
+import com.example.bluesnap.ui.components.ScreenHeader
+import com.example.bluesnap.ui.navigation.bottomBarContentPadding
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -59,6 +62,7 @@ fun HistoryScreen(
     val safeTopPadding = with(density) {
         WindowInsets.statusBars.getTop(this).toDp().coerceAtMost(44.dp)
     }
+    val bottomContentPadding = bottomBarContentPadding()
 
     Column(
         modifier = Modifier
@@ -67,41 +71,23 @@ fun HistoryScreen(
             .padding(horizontal = 20.dp)
     ) {
         Spacer(modifier = Modifier.height(safeTopPadding + 12.dp))
-        Row(verticalAlignment = Alignment.CenterVertically) {
-            Surface(
-                modifier = Modifier.size(42.dp),
-                shape = RoundedCornerShape(12.dp),
-                color = MaterialTheme.colorScheme.primaryContainer
-            ) {
-                Box(contentAlignment = Alignment.Center) {
-                    Icon(
-                        imageVector = Icons.Filled.History,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.width(12.dp))
-            Column {
-                Text(
-                    text = "历史记录",
-                    style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-                )
-                Text(
-                    text = "保存本次会话生成过的轻工具",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f)
-                )
-            }
-        }
+        ScreenHeader(
+            title = "历史记录",
+            subtitle = "保存本次会话生成过的轻工具",
+            icon = Icons.Filled.History
+        )
         Spacer(modifier = Modifier.height(18.dp))
 
         if (apps.isEmpty()) {
-            EmptyHistoryState(onCreate = onCreate)
+            EmptyHistoryState(
+                onCreate = onCreate,
+                bottomPadding = bottomContentPadding
+            )
         } else {
             LazyColumn(
                 modifier = Modifier.fillMaxSize(),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
+                verticalArrangement = Arrangement.spacedBy(12.dp),
+                contentPadding = PaddingValues(bottom = bottomContentPadding)
             ) {
                 items(apps.asReversed(), key = { it.id }) { app ->
                     HistoryAppCard(
@@ -111,15 +97,22 @@ fun HistoryScreen(
                         onDelete = { onDelete(app.id) }
                     )
                 }
-                item { Spacer(modifier = Modifier.height(24.dp)) }
             }
         }
     }
 }
 
 @Composable
-private fun EmptyHistoryState(onCreate: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
+private fun EmptyHistoryState(
+    onCreate: () -> Unit,
+    bottomPadding: androidx.compose.ui.unit.Dp
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(bottom = bottomPadding),
+        contentAlignment = Alignment.Center
+    ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             modifier = Modifier.padding(24.dp)

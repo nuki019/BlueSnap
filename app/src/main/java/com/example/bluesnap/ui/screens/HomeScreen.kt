@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.luminance
 import com.example.bluesnap.ui.components.Template
 import com.example.bluesnap.ui.components.defaultTemplates
+import com.example.bluesnap.ui.navigation.bottomBarContentPadding
 
 @Composable
 fun HomeScreen(
@@ -226,7 +227,7 @@ fun HomeScreen(
                 .padding(top = 18.dp, bottom = 24.dp)
         )
 
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(bottomBarContentPadding()))
     }
 }
 

@@ -20,7 +20,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Api
 import androidx.compose.material.icons.filled.DarkMode
-import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Tune
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.AssistChip
@@ -52,20 +52,19 @@ import androidx.compose.ui.unit.dp
 import com.example.bluesnap.data.ModelPreset
 import com.example.bluesnap.data.ModelPresets
 import com.example.bluesnap.data.ThemeMode
+import com.example.bluesnap.ui.components.ScreenHeader
+import com.example.bluesnap.ui.navigation.bottomBarContentPadding
 
 @Composable
 fun SettingsScreen(
     themeMode: ThemeMode,
     systemPrompt: String,
-    activeProviderLabel: String,
-    apiKeyModeLabel: String,
     fallbackModelPresetId: String?,
     fallbackModelLabel: String,
     fallbackModelKeyLabel: String,
     onThemeModeChange: (ThemeMode) -> Unit,
     onSystemPromptChange: (String) -> Unit,
-    onSaveFallbackModel: (String, String) -> Unit,
-    onBackHome: () -> Unit
+    onSaveFallbackModel: (String, String) -> Unit
 ) {
     val density = LocalDensity.current
     val safeTopPadding = with(density) {
@@ -82,14 +81,10 @@ fun SettingsScreen(
             .padding(top = safeTopPadding + 12.dp),
         verticalArrangement = Arrangement.spacedBy(14.dp)
     ) {
-        Text(
-            text = "系统设置",
-            style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.Bold)
-        )
-        Text(
-            text = "管理主题、生成风格与模型连接状态。",
-            style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.62f)
+        ScreenHeader(
+            title = "系统设置",
+            subtitle = "管理主题、生成风格与模型连接状态",
+            icon = Icons.Filled.Settings
         )
 
         SettingCard(
@@ -122,16 +117,16 @@ fun SettingsScreen(
 
         SettingCard(
             title = "模型服务",
-            subtitle = "选择备用生成模型，主模型不可用时自动切换。",
+            subtitle = "默认使用蓝心大模型，主模型不可用时自动切换。",
             icon = { Icon(Icons.Filled.Api, contentDescription = null) }
         ) {
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-                AssistChip(onClick = {}, label = { Text(activeProviderLabel) })
+                AssistChip(onClick = {}, label = { Text("蓝心大模型") })
                 AssistChip(onClick = {}, label = { Text("DeepSeek（备用）") })
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = apiKeyModeLabel,
+                text = "默认使用蓝心大模型生成；无网络或模型服务不可用时，自动使用 Demo 演示。",
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.74f)
             )
@@ -158,16 +153,7 @@ fun SettingsScreen(
             }
         }
 
-        Button(
-            onClick = onBackHome,
-            modifier = Modifier.fillMaxWidth().height(50.dp),
-            shape = RoundedCornerShape(14.dp)
-        ) {
-            Icon(Icons.Filled.Home, contentDescription = null)
-            Spacer(modifier = Modifier.width(8.dp))
-            Text("返回创造页")
-        }
-        Spacer(modifier = Modifier.height(24.dp))
+        Spacer(modifier = Modifier.height(bottomBarContentPadding()))
     }
 
     if (showModelDialog) {
