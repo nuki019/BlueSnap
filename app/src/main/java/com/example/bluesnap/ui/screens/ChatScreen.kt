@@ -15,8 +15,6 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.focus.FocusRequester
-import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import com.example.bluesnap.data.ChatMessage
@@ -30,29 +28,19 @@ fun ChatScreen(
     messages: List<ChatMessage>,
     isGenerating: Boolean,
     streamingContent: String,
+    activeProviderLabel: String,
     onSendMessage: (String) -> Unit,
     onViewPlan: () -> Unit,
     onBack: () -> Unit
 ) {
     var inputText by remember { mutableStateOf("") }
     val listState = rememberLazyListState()
-    val inputFocusRequester = remember { FocusRequester() }
 
     // 自动滚动到底部（包括流式输出时）
     LaunchedEffect(messages.size, isGenerating, streamingContent.length) {
         val totalItems = messages.size + if (streamingContent.isNotEmpty()) 1 else 0
         if (totalItems > 0) {
             listState.animateScrollToItem(totalItems - 1)
-        }
-    }
-
-    // 流式输出结束后恢复输入框焦点
-    LaunchedEffect(isGenerating) {
-        if (!isGenerating) {
-            kotlinx.coroutines.delay(100)
-            try {
-                inputFocusRequester.requestFocus()
-            } catch (_: Exception) {}
         }
     }
 
@@ -133,7 +121,7 @@ fun ChatScreen(
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "蓝心快搭正在构思中...",
+                                text = "正在调用 $activeProviderLabel 生成方案...",
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.primary
                             )
@@ -186,9 +174,7 @@ fun ChatScreen(
                 OutlinedTextField(
                     value = inputText,
                     onValueChange = { inputText = it },
-                    modifier = Modifier
-                        .weight(1f)
-                        .focusRequester(inputFocusRequester),
+                    modifier = Modifier.weight(1f),
                     placeholder = { Text("描述你的需求...") },
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true,

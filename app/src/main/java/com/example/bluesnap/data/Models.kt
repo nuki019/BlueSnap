@@ -64,6 +64,7 @@ data class AppState(
     val currentPlan: AppPlan? = null,
     val isGenerating: Boolean = false,
     val generationStage: GenerationStage = GenerationStage.IDLE,
+    val generationLogs: List<String> = emptyList(),
     /** 流式输出中 AI 正在生成的内容，尚未成为完整消息。 */
     val streamingContent: String = "",
     val generatedApp: GeneratedApp? = null,
@@ -73,5 +74,6 @@ data class AppState(
     val themeMode: ThemeMode = ThemeMode.SYSTEM,
     val systemPrompt: String = DEFAULT_SYSTEM_PROMPT,
     val activeProviderLabel: String = "蓝心大模型",
-    val apiKeyModeLabel: String = "参赛 AppKey 已通过构建配置注入"
+    val apiKeyModeLabel: String = "参赛 AppKey 已通过构建配置注入",
+    val isAppInForeground: Boolean = true
 )

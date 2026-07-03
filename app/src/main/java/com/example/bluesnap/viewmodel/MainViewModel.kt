@@ -18,6 +18,7 @@ import com.example.bluesnap.data.GenerationStage
 import com.example.bluesnap.data.Role
 import com.example.bluesnap.data.Screen
 import com.example.bluesnap.data.ThemeMode
+import com.example.bluesnap.notification.GenerationNotifier
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -28,6 +29,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private val aiService: AiService = AiServiceFactory.create()
     private val prefs = application.getSharedPreferences("bluesnap_settings", Context.MODE_PRIVATE)
+    private val notifier = GenerationNotifier(application)
 
     private val _state = MutableStateFlow(
         AppState(
@@ -47,6 +49,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 messages = it.messages + userMsg,
                 isGenerating = true,
                 generationStage = GenerationStage.UNDERSTANDING,
+                generationLogs = listOf(
+                    "收到需求，准备连接 ${providerLabel()}",
+                    "构建对话上下文，等待模型返回"
+                ),
                 streamingContent = ""
             )
         }
@@ -85,6 +91,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         messages = it.messages + errMsg,
                         isGenerating = false,
                         generationStage = GenerationStage.IDLE,
+                        generationLogs = it.generationLogs + "请求失败，已保留可用兜底路径",
                         streamingContent = ""
                     )
                 }
@@ -94,14 +101,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun generatePlan() {
         viewModelScope.launch {
-            _state.update { it.copy(isGenerating = true, generationStage = GenerationStage.PLANNING) }
+            _state.update {
+                it.copy(
+                    isGenerating = true,
+                    generationStage = GenerationStage.PLANNING,
+                    generationLogs = it.generationLogs + "生成可勾选的功能清单和界面风格"
+                )
+            }
             try {
                 val plan = aiService.generatePlan(_state.value.messages, _state.value.systemPrompt)
                 _state.update {
                     it.copy(
                         currentPlan = plan,
                         isGenerating = false,
-                        generationStage = GenerationStage.IDLE
+                        generationStage = GenerationStage.IDLE,
+                        generationLogs = it.generationLogs + "方案已生成，等待用户确认"
                     )
                 }
                 navigateTo(Screen.PLAN)
@@ -115,7 +129,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     it.copy(
                         messages = it.messages + errMsg,
                         isGenerating = false,
-                        generationStage = GenerationStage.IDLE
+                        generationStage = GenerationStage.IDLE,
+                        generationLogs = it.generationLogs + "方案生成失败，可调整需求后重试"
                     )
                 }
             }
@@ -147,9 +162,24 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
         viewModelScope.launch {
             try {
-                _state.update { it.copy(isGenerating = true, generationStage = GenerationStage.BUILDING) }
+                _state.update {
+                    it.copy(
+                        isGenerating = true,
+                        generationStage = GenerationStage.BUILDING,
+                        generationLogs = listOf(
+                            "锁定已选功能，准备生成单文件 HTML",
+                            "发送 Chat Completions 请求到 ${providerLabel()}",
+                            "后台生成继续运行，可切出应用等待通知"
+                        )
+                    )
+                }
                 val bundle = aiService.generateBundle(plan, _state.value.messages, _state.value.systemPrompt)
-                _state.update { it.copy(generationStage = GenerationStage.CHECKING) }
+                _state.update {
+                    it.copy(
+                        generationStage = GenerationStage.CHECKING,
+                        generationLogs = it.generationLogs + "模型返回完成，开始解析 summary/html/media prompt"
+                    )
+                }
                 val app = GeneratedApp(
                     name = plan.name,
                     description = plan.description,
@@ -158,15 +188,25 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     imagePrompt = bundle.imagePrompt,
                     audioPrompt = bundle.audioPrompt
                 )
-                _state.update { it.copy(generationStage = GenerationStage.LOADING) }
+                _state.update {
+                    it.copy(
+                        generationStage = GenerationStage.LOADING,
+                        generationLogs = it.generationLogs + "HTML 完整性检查通过，写入本地历史记录"
+                    )
+                }
+                val shouldNotify = !_state.value.isAppInForeground
                 _state.update {
                     it.copy(
                         generatedApp = app,
                         savedApps = it.savedApps + app,
                         isGenerating = false,
                         generationStage = GenerationStage.IDLE,
+                        generationLogs = it.generationLogs + "生成完成，可预览、导出和分享",
                         previewReturnScreen = Screen.HOME
                     )
+                }
+                if (shouldNotify) {
+                    notifier.notifyGenerated(app.name)
                 }
                 navigateTo(Screen.PREVIEW)
             } catch (e: Exception) {
@@ -179,7 +219,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     it.copy(
                         messages = it.messages + errMsg,
                         isGenerating = false,
-                        generationStage = GenerationStage.IDLE
+                        generationStage = GenerationStage.IDLE,
+                        generationLogs = it.generationLogs + "应用生成失败，请重试或使用固定模板"
                     )
                 }
             }
@@ -214,6 +255,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         _state.update { it.copy(currentScreen = screen) }
     }
 
+    fun setAppInForeground(inForeground: Boolean) {
+        _state.update { it.copy(isAppInForeground = inForeground) }
+    }
+
     fun handleBack() {
         when (_state.value.currentScreen) {
             Screen.SHARE -> navigateTo(Screen.PREVIEW)
@@ -233,6 +278,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 messages = emptyList(),
                 currentPlan = null,
                 streamingContent = "",
+                generationLogs = emptyList(),
                 generationStage = GenerationStage.IDLE
             )
         }
@@ -280,7 +326,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     private fun providerLabel(): String {
-        return when (BuildConfig.AI_PROVIDER.lowercase()) {
+        val config = AiConfig(
+            provider = BuildConfig.AI_PROVIDER,
+            fallbackProvider = BuildConfig.AI_FALLBACK_PROVIDER,
+            demoMode = BuildConfig.AI_DEMO_MODE,
+            apiKey = BuildConfig.AI_API_KEY,
+            baseUrl = BuildConfig.AI_BASE_URL,
+            model = BuildConfig.AI_MODEL
+        )
+        if (config.demoMode || !config.hasUsableKey) return "离线 Demo"
+        return when (config.provider.lowercase()) {
             "deepseek" -> "DeepSeek"
             "mock" -> "离线 Demo"
             else -> "蓝心大模型"
@@ -296,10 +351,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             baseUrl = BuildConfig.AI_BASE_URL,
             model = BuildConfig.AI_MODEL
         )
+        val fallback = BuildConfig.AI_FALLBACK_PROVIDER.trim().ifBlank { "mock" }
         return when {
-            config.demoMode -> "离线 Demo：不使用真实 key"
-            config.hasUsableKey -> "参赛 AppKey：已通过构建配置注入"
-            else -> "未配置可用 key，将自动使用 Mock"
+            config.demoMode -> "当前运行模式：离线 Demo，不使用真实 key。"
+            config.hasUsableKey -> "当前运行模式：联网生成；参赛 AppKey 已通过构建配置注入；失败后兜底：$fallback。"
+            else -> "当前运行模式：未配置可用 key，将自动使用 Mock 兜底。"
         }
     }
 

@@ -24,11 +24,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.luminance
 import com.example.bluesnap.ui.components.Template
 import com.example.bluesnap.ui.components.defaultTemplates
 
@@ -40,6 +42,10 @@ fun HomeScreen(
 ) {
     var inputText by remember { mutableStateOf("") }
     val focusManager = LocalFocusManager.current
+    val density = LocalDensity.current
+    val safeTopPadding = with(density) {
+        WindowInsets.statusBars.getTop(this).toDp().coerceAtMost(44.dp)
+    }
 
     fun submit() {
         if (inputText.isNotBlank()) {
@@ -50,9 +56,10 @@ fun HomeScreen(
         }
     }
 
+    val lightBackground = MaterialTheme.colorScheme.background.luminance() > 0.5f
     val pageBackground = Brush.verticalGradient(
         colors = listOf(
-            Color(0xFFEAF4FF),
+            if (lightBackground) Color(0xFFEAF4FF) else Color(0xFF101826),
             MaterialTheme.colorScheme.background,
             MaterialTheme.colorScheme.background
         )
@@ -62,11 +69,10 @@ fun HomeScreen(
         modifier = Modifier
             .fillMaxSize()
             .background(pageBackground)
-            .statusBarsPadding()
             .verticalScroll(rememberScrollState())
             .padding(horizontal = 18.dp)
     ) {
-        Spacer(modifier = Modifier.height(18.dp))
+        Spacer(modifier = Modifier.height(safeTopPadding + 8.dp))
 
         HeroPanel()
 
@@ -220,7 +226,7 @@ fun HomeScreen(
                 .padding(top = 18.dp, bottom = 24.dp)
         )
 
-        Spacer(modifier = Modifier.height(110.dp))
+        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -355,14 +361,14 @@ private fun ScenarioCard(
             Surface(
                 modifier = Modifier.size(38.dp),
                 shape = RoundedCornerShape(13.dp),
-                color = Color(0xFFEAF4FF)
+                color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f)
             ) {
                 Box(contentAlignment = Alignment.Center) {
                     Icon(
                         imageVector = template.icon,
                         contentDescription = null,
                         modifier = Modifier.size(21.dp),
-                        tint = Color(0xFF0B7CFF)
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer
                     )
                 }
             }

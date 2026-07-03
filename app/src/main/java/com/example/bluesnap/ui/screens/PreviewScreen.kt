@@ -19,13 +19,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -43,7 +44,6 @@ import androidx.compose.material.icons.filled.Upgrade
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.ExtendedFloatingActionButton
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -55,6 +55,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
@@ -64,14 +65,17 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import com.example.bluesnap.BuildConfig
 import com.example.bluesnap.data.GeneratedApp
 import com.example.bluesnap.data.GenerationStage
 import java.io.ByteArrayInputStream
+import kotlinx.coroutines.delay
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -89,6 +93,10 @@ fun PreviewScreen(
     var pendingExportApp by remember { mutableStateOf<GeneratedApp?>(null) }
     val context = LocalContext.current
     val focusManager = LocalFocusManager.current
+    val density = LocalDensity.current
+    val safeTopPadding = with(density) {
+        WindowInsets.statusBars.getTop(this).toDp().coerceAtMost(44.dp)
+    }
     val sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true)
     val exportLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.CreateDocument("text/html")
@@ -104,30 +112,19 @@ fun PreviewScreen(
         when {
             app == null -> EmptyPreviewState(onBack = onBack)
             isGenerating -> GeneratingPreview(stage = generationStage)
-            else -> AppWebView(app = app, reloadToken = reloadToken)
+            else -> AppWebView(app = app, reloadToken = reloadToken, topPadding = safeTopPadding)
         }
 
-        PreviewTitlePill(
-            title = app?.name ?: "预览",
-            onBack = onBack,
-            modifier = Modifier
-                .align(Alignment.TopStart)
-                .statusBarsPadding()
-                .padding(start = 12.dp, top = 10.dp)
-        )
-
         if (app != null) {
-            ExtendedFloatingActionButton(
+            FilledIconButton(
                 onClick = { showActions = true },
                 modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .navigationBarsPadding()
-                    .padding(end = 16.dp, bottom = 18.dp),
-                icon = { Icon(Icons.Filled.MoreVert, contentDescription = null) },
-                text = { Text("操作") },
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = MaterialTheme.colorScheme.onPrimary
-            )
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 10.dp)
+                    .size(48.dp)
+            ) {
+                Icon(Icons.Filled.MoreVert, contentDescription = "操作")
+            }
         }
     }
 
@@ -255,34 +252,6 @@ fun PreviewScreen(
 }
 
 @Composable
-private fun PreviewTitlePill(
-    title: String,
-    onBack: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Surface(
-        modifier = modifier,
-        shape = RoundedCornerShape(999.dp),
-        color = MaterialTheme.colorScheme.surface.copy(alpha = 0.94f),
-        shadowElevation = 8.dp
-    ) {
-        Row(
-            modifier = Modifier.padding(start = 4.dp, end = 14.dp, top = 4.dp, bottom = 4.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            IconButton(onClick = onBack, modifier = Modifier.size(38.dp)) {
-                Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
-            }
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
-                maxLines = 1
-            )
-        }
-    }
-}
-
-@Composable
 private fun PreviewActionRow(
     icon: @Composable () -> Unit,
     title: String,
@@ -359,7 +328,7 @@ private const val DEBUG_JS_BRIDGE = """
 
 @SuppressLint("SetJavaScriptEnabled")
 @Composable
-private fun AppWebView(app: GeneratedApp, reloadToken: Int) {
+private fun AppWebView(app: GeneratedApp, reloadToken: Int, topPadding: Dp) {
     val baseUrl = "https://${app.id}.localhost/"
     AndroidView(
         factory = { context ->
@@ -411,7 +380,9 @@ private fun AppWebView(app: GeneratedApp, reloadToken: Int) {
                 )
             }
         },
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = topPadding)
     )
 }
 

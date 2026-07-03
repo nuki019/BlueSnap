@@ -43,7 +43,7 @@ android {
 
         buildConfigField("String", "AI_PROVIDER", quotedBuildConfig(prop("ai.provider", "vivo")))
         buildConfigField("String", "AI_FALLBACK_PROVIDER", quotedBuildConfig(prop("ai.fallback.provider", "mock")))
-        buildConfigField("boolean", "AI_DEMO_MODE", prop("ai.demo.mode", "true").toBooleanStrictOrNull()?.toString() ?: "true")
+        buildConfigField("boolean", "AI_DEMO_MODE", prop("ai.demo.mode", "false").toBooleanStrictOrNull()?.toString() ?: "false")
         buildConfigField("String", "AI_API_KEY", quotedBuildConfig(prop("ai.api.key", "YOUR_API_KEY_HERE")))
         buildConfigField("String", "AI_BASE_URL", quotedBuildConfig(prop("ai.base.url", "https://api-ai.vivo.com.cn/v1")))
         buildConfigField("String", "AI_MODEL", quotedBuildConfig(prop("ai.model", "Doubao-Seed-2.0-pro")))

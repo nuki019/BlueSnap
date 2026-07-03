@@ -31,7 +31,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ProvideTextStyle
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -62,18 +61,7 @@ fun AppNavigation(viewModel: MainViewModel) {
         viewModel.handleBack()
     }
 
-    Scaffold(
-        bottomBar = {
-            if (showBottomBar) {
-                FloatingBottomBar(
-                    currentScreen = state.currentScreen,
-                    onHistory = { viewModel.navigateTo(Screen.HISTORY) },
-                    onCreate = { viewModel.navigateTo(Screen.HOME) },
-                    onSettings = { viewModel.navigateTo(Screen.SETTINGS) }
-                )
-            }
-        }
-    ) { innerPadding ->
+    Box(modifier = Modifier.fillMaxSize()) {
         AnimatedContent(
             targetState = state.currentScreen,
             transitionSpec = {
@@ -81,9 +69,7 @@ fun AppNavigation(viewModel: MainViewModel) {
                     fadeOut() + slideOutHorizontally { -it / 3 }
             },
             label = "screenTransition",
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(innerPadding)
+            modifier = Modifier.fillMaxSize()
         ) { screen ->
             when (screen) {
                 Screen.HOME -> HomeScreen(
@@ -114,6 +100,7 @@ fun AppNavigation(viewModel: MainViewModel) {
                     messages = state.messages,
                     isGenerating = state.isGenerating,
                     streamingContent = state.streamingContent,
+                    activeProviderLabel = state.activeProviderLabel,
                     onSendMessage = { viewModel.sendMessage(it) },
                     onViewPlan = { viewModel.generatePlan() },
                     onBack = { viewModel.handleBack() }
@@ -123,6 +110,9 @@ fun AppNavigation(viewModel: MainViewModel) {
                     plan = state.currentPlan,
                     isGenerating = state.isGenerating,
                     generationStage = state.generationStage,
+                    generationLogs = state.generationLogs,
+                    activeProviderLabel = state.activeProviderLabel,
+                    apiKeyModeLabel = state.apiKeyModeLabel,
                     onToggleFeature = { viewModel.toggleFeature(it) },
                     onSelectLayout = { viewModel.selectLayout(it) },
                     onConfirm = { viewModel.confirmPlan() },
@@ -145,6 +135,16 @@ fun AppNavigation(viewModel: MainViewModel) {
                 )
             }
         }
+
+        if (showBottomBar) {
+            FloatingBottomBar(
+                currentScreen = state.currentScreen,
+                onHistory = { viewModel.navigateTo(Screen.HISTORY) },
+                onCreate = { viewModel.navigateTo(Screen.HOME) },
+                onSettings = { viewModel.navigateTo(Screen.SETTINGS) },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
     }
 }
 
@@ -153,24 +153,25 @@ private fun FloatingBottomBar(
     currentScreen: Screen,
     onHistory: () -> Unit,
     onCreate: () -> Unit,
-    onSettings: () -> Unit
+    onSettings: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Box(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .background(Color.Transparent)
             .navigationBarsPadding()
-            .padding(horizontal = 32.dp, vertical = 10.dp),
+            .padding(horizontal = 34.dp, vertical = 12.dp),
         contentAlignment = Alignment.BottomCenter
     ) {
         Surface(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(64.dp),
-            shape = RoundedCornerShape(28.dp),
-            color = MaterialTheme.colorScheme.surface,
-            shadowElevation = 10.dp,
-            tonalElevation = 4.dp
+                .height(66.dp),
+            shape = RoundedCornerShape(32.dp),
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.96f),
+            shadowElevation = 22.dp,
+            tonalElevation = 8.dp
         ) {
             Row(
                 modifier = Modifier
@@ -199,8 +200,8 @@ private fun FloatingBottomBar(
             onClick = onCreate,
             modifier = Modifier
                 .align(Alignment.TopCenter)
-                .offset(y = (-12).dp)
-                .size(56.dp),
+                .offset(y = (-16).dp)
+                .size(58.dp),
             shape = CircleShape,
             containerColor = MaterialTheme.colorScheme.primary,
             contentColor = MaterialTheme.colorScheme.onPrimary
