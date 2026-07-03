@@ -23,7 +23,6 @@ import com.example.bluesnap.data.ChatMessage
 import com.example.bluesnap.data.Role
 import com.example.bluesnap.ui.components.MessageBubble
 import com.example.bluesnap.ui.components.StreamingBubble
-import com.example.bluesnap.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -39,7 +38,7 @@ fun ChatScreen(
     val listState = rememberLazyListState()
     val inputFocusRequester = remember { FocusRequester() }
 
-    // 自动滚动到底部（包括流式输出时）
+    // ????????????????
     LaunchedEffect(messages.size, isGenerating, streamingContent.length) {
         val totalItems = messages.size + if (streamingContent.isNotEmpty()) 1 else 0
         if (totalItems > 0) {
@@ -47,7 +46,7 @@ fun ChatScreen(
         }
     }
 
-    // 流式输出结束后恢复输入框焦点
+    // ??????????????
     LaunchedEffect(isGenerating) {
         if (!isGenerating) {
             kotlinx.coroutines.delay(100)
@@ -64,21 +63,21 @@ fun ChatScreen(
         }
     }
 
-    // Box 布局：消息列表铺满全屏（不动），输入框浮层叠加（跟随键盘）
+    // Box ?????????????????????????????
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colorScheme.background)
     ) {
-        // ── 消息列表：铺满全屏，不响应键盘 ──
+        // ?? ??????????????? ??
         Column(modifier = Modifier.fillMaxSize()) {
-            // 顶部栏
+            // ???
             TopAppBar(
                 title = {
                     Column {
-                        Text("蓝心快搭", style = MaterialTheme.typography.titleMedium)
+                        Text("????", style = MaterialTheme.typography.titleMedium)
                         Text(
-                            "AI 应用生成助手",
+                            "AI ??????",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                         )
@@ -86,7 +85,7 @@ fun ChatScreen(
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "??")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -101,7 +100,7 @@ fun ChatScreen(
                     .weight(1f)
                     .fillMaxWidth(),
                 state = listState,
-                // 底部留出输入栏高度的空间，避免最后一条消息被遮挡
+                // ????????????????????????
                 contentPadding = PaddingValues(
                     top = 12.dp,
                     bottom = 72.dp
@@ -111,14 +110,14 @@ fun ChatScreen(
                     MessageBubble(message = message)
                 }
 
-                // 流式输出中的实时气泡
+                // ??????????
                 if (streamingContent.isNotEmpty()) {
                     item(key = "streaming") {
                         StreamingBubble(content = streamingContent)
                     }
                 }
 
-                // 生成中指示器（非流式阶段，如方案生成）
+                // ???????????????????
                 if (isGenerating && streamingContent.isEmpty()) {
                     item {
                         Row(
@@ -130,21 +129,21 @@ fun ChatScreen(
                             CircularProgressIndicator(
                                 modifier = Modifier.size(16.dp),
                                 strokeWidth = 2.dp,
-                                color = BluePrimary
+                                color = MaterialTheme.colorScheme.primary
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "蓝心快搭正在构思中...",
+                                text = "?????????...",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = BluePrimary.copy(alpha = 0.7f)
+                                color = MaterialTheme.colorScheme.primary
                             )
                         }
                     }
                 }
 
-                // 查看方案按钮
+                // ??????
                 val lastAiMessage = messages.lastOrNull { it.role == Role.ASSISTANT }
-                if (lastAiMessage != null && lastAiMessage.content.contains("方案") && !isGenerating) {
+                if (lastAiMessage != null && lastAiMessage.content.contains("??") && !isGenerating) {
                     item {
                         Row(
                             modifier = Modifier
@@ -155,12 +154,12 @@ fun ChatScreen(
                             Button(
                                 onClick = onViewPlan,
                                 colors = ButtonDefaults.buttonColors(
-                                    containerColor = BluePrimary
+                                    containerColor = MaterialTheme.colorScheme.primary
                                 ),
                                 shape = RoundedCornerShape(20.dp),
                                 contentPadding = PaddingValues(horizontal = 20.dp, vertical = 8.dp)
                             ) {
-                                Text("查看方案 →", style = MaterialTheme.typography.labelLarge)
+                                Text("???? ?", style = MaterialTheme.typography.labelLarge)
                             }
                         }
                     }
@@ -168,7 +167,7 @@ fun ChatScreen(
             }
         }
 
-        // ── 输入栏：浮层，固定在底部，imePadding 仅作用于此 ──
+        // ?? ?????????????imePadding ????? ??
         Surface(
             color = MaterialTheme.colorScheme.surface,
             shadowElevation = 8.dp,
@@ -190,13 +189,13 @@ fun ChatScreen(
                     modifier = Modifier
                         .weight(1f)
                         .focusRequester(inputFocusRequester),
-                    placeholder = { Text("描述你的需求...") },
+                    placeholder = { Text("??????...") },
                     shape = RoundedCornerShape(24.dp),
                     singleLine = true,
                     keyboardOptions = KeyboardOptions(imeAction = ImeAction.Send),
                     keyboardActions = KeyboardActions(onSend = { submit() }),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = BluePrimary,
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
                         unfocusedBorderColor = MaterialTheme.colorScheme.surfaceVariant
                     )
                 )
@@ -207,7 +206,7 @@ fun ChatScreen(
                 ) {
                     Icon(
                         Icons.AutoMirrored.Filled.Send,
-                        contentDescription = "发送"
+                        contentDescription = "??"
                     )
                 }
             }

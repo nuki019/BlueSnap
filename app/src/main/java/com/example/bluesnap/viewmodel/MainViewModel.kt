@@ -19,7 +19,7 @@ class MainViewModel : ViewModel() {
     private val _state = MutableStateFlow(AppState())
     val state: StateFlow<AppState> = _state.asStateFlow()
 
-    // ── 公开方法 ──────────────────────────────────────────────────────
+    // ?? ???? ??????????????????????????????????????????????????????
 
     fun sendMessage(content: String) {
         if (content.isBlank()) return
@@ -28,17 +28,17 @@ class MainViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                // 使用流式输出
+                // ??????
                 var collectCount = 0
                 aiService.chatStream(_state.value.messages).collect { partialContent ->
                     collectCount++
-                    Log.d("MainViewModel", "collect #$collectCount, 长度=${partialContent.length}")
+                    Log.d("MainViewModel", "collect #$collectCount, ??=${partialContent.length}")
                     _state.update { it.copy(streamingContent = partialContent) }
                 }
 
-                // 流式完成：将完整内容转为正式消息
+                // ????????????????
                 val finalContent = _state.value.streamingContent
-                Log.d("MainViewModel", "流式完成, collectCount=$collectCount, finalContent长度=${finalContent.length}")
+                Log.d("MainViewModel", "????, collectCount=$collectCount, finalContent??=${finalContent.length}")
                 if (finalContent.isNotEmpty()) {
                     val aiReply = ChatMessage(role = Role.ASSISTANT, content = finalContent)
                     _state.update {
@@ -48,22 +48,22 @@ class MainViewModel : ViewModel() {
                             isGenerating = false
                         )
                     }
-                    Log.d("MainViewModel", "消息已创建并添加")
+                    Log.d("MainViewModel", "????????")
 
-                    // 根据 AI 回复判断是否自动生成方案
+                    // ?? AI ????????????
                     if (shouldAutoPlan(finalContent)) {
                         generatePlan()
                     }
                 } else {
-                    Log.w("MainViewModel", "流式完成但 finalContent 为空")
+                    Log.w("MainViewModel", "????? finalContent ??")
                     _state.update { it.copy(isGenerating = false, streamingContent = "") }
                 }
             } catch (e: Exception) {
-                Log.e("MainViewModel", "AI 请求失败", e)
-                val errorDetail = e.message ?: "未知错误"
+                Log.e("MainViewModel", "AI ????", e)
+                val errorDetail = e.message ?: "????"
                 val errMsg = ChatMessage(
                     role = Role.ASSISTANT,
-                    content = "请求失败: $errorDetail"
+                    content = "????: $errorDetail"
                 )
                 _state.update {
                     it.copy(
@@ -84,10 +84,10 @@ class MainViewModel : ViewModel() {
                 _state.update { it.copy(currentPlan = plan, isGenerating = false) }
                 navigateTo(Screen.PLAN)
             } catch (e: Exception) {
-                Log.e("MainViewModel", "生成方案失败", e)
+                Log.e("MainViewModel", "??????", e)
                 val errMsg = ChatMessage(
                     role = Role.ASSISTANT,
-                    content = "生成方案失败: ${e.message ?: "未知错误"}"
+                    content = "??????: ${e.message ?: "????"}"
                 )
                 _state.update { it.copy(messages = it.messages + errMsg, isGenerating = false) }
             }
@@ -119,11 +119,14 @@ class MainViewModel : ViewModel() {
 
         viewModelScope.launch {
             try {
-                val html = aiService.generateHtml(plan, _state.value.messages)
+                val bundle = aiService.generateBundle(plan, _state.value.messages)
                 val app = GeneratedApp(
                     name = plan.name,
                     description = plan.description,
-                    htmlContent = html
+                    htmlContent = bundle.html,
+                    summary = bundle.summary.ifBlank { plan.description },
+                    imagePrompt = bundle.imagePrompt,
+                    audioPrompt = bundle.audioPrompt
                 )
                 _state.update {
                     it.copy(
@@ -134,13 +137,14 @@ class MainViewModel : ViewModel() {
                 }
                 navigateTo(Screen.PREVIEW)
             } catch (e: Exception) {
-                Log.e("MainViewModel", "生成 HTML 失败", e)
+                Log.e("MainViewModel", "?? HTML ??", e)
                 _state.update { it.copy(isGenerating = false) }
             }
         }
     }
 
     fun iterateWithFeedback(feedback: String) {
+        navigateTo(Screen.CHAT)
         sendMessage(feedback)
     }
 
@@ -149,32 +153,63 @@ class MainViewModel : ViewModel() {
     }
 
     fun openApp(app: GeneratedApp) {
-        _state.update { it.copy(generatedApp = app) }
+        _state.update { it.copy(generatedApp = app, previewReturnScreen = it.currentScreen) }
         navigateTo(Screen.PREVIEW)
+    }
+
+    fun shareApp(app: GeneratedApp) {
+        _state.update {
+            it.copy(
+                generatedApp = app,
+                previewReturnScreen = it.currentScreen,
+                currentScreen = Screen.SHARE
+            )
+        }
+    }
+
+    fun openGeneratedPreview() {
+        _state.update { it.copy(previewReturnScreen = it.currentScreen, currentScreen = Screen.PREVIEW) }
     }
 
     fun navigateTo(screen: Screen) {
         _state.update { it.copy(currentScreen = screen) }
     }
 
+    fun handleBack() {
+        val current = _state.value.currentScreen
+        when (current) {
+            Screen.SHARE -> navigateTo(Screen.PREVIEW)
+            Screen.PREVIEW -> navigateTo(_state.value.previewReturnScreen.takeIf { it == Screen.HISTORY } ?: Screen.HOME)
+            Screen.PLAN -> navigateTo(Screen.CHAT)
+            Screen.CHAT -> navigateTo(Screen.HOME)
+            Screen.HISTORY -> navigateTo(Screen.HOME)
+            Screen.HOME -> Unit
+        }
+    }
+
     fun clearChat() {
         _state.update { it.copy(messages = emptyList(), currentPlan = null, streamingContent = "") }
     }
 
-    fun startFromTemplate(templateName: String) {
+    fun startFromTemplate(templateRequest: String) {
         clearChat()
         navigateTo(Screen.CHAT)
-        sendMessage("帮我做一个${templateName}")
+        val request = if (templateRequest.contains("???") || templateRequest.length > 10) {
+            templateRequest
+        } else {
+            "?????$templateRequest"
+        }
+        sendMessage(request)
     }
 
-    // ── 私有方法 ──────────────────────────────────────────────────────
+    // ?? ???? ??????????????????????????????????????????????????????
 
     /**
-     * 根据 AI 回复内容判断是否自动生成方案。
-     * 当 AI 表示已理解需求并准备好方案时触发。
+     * ?? AI ???????????????
+     * ? AI ?????????????????
      */
     private fun shouldAutoPlan(aiReply: String): Boolean {
-        val triggers = listOf("方案", "规划好", "已经理解", "为你设计", "可以生成")
+        val triggers = listOf("??", "???", "????", "????", "????")
         return triggers.any { aiReply.contains(it) }
     }
 

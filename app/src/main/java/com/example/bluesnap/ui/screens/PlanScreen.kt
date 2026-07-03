@@ -16,7 +16,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.bluesnap.data.AppPlan
 import com.example.bluesnap.ui.components.PlanCard
-import com.example.bluesnap.ui.theme.BluePrimary
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -29,14 +28,14 @@ fun PlanScreen(
     onBack: () -> Unit
 ) {
     Column(modifier = Modifier.fillMaxSize().background(MaterialTheme.colorScheme.background)) {
-        // 顶部栏
+        // ???
         TopAppBar(
             title = {
-                Text("方案确认", style = MaterialTheme.typography.titleMedium)
+                Text("????", style = MaterialTheme.typography.titleMedium)
             },
             navigationIcon = {
                 IconButton(onClick = onBack) {
-                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                    Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "??")
                 }
             },
             colors = TopAppBarDefaults.topAppBarColors(
@@ -47,19 +46,19 @@ fun PlanScreen(
         HorizontalDivider(color = MaterialTheme.colorScheme.surfaceVariant)
 
         if (plan == null) {
-            // 无方案状态
+            // ?????
             Box(
                 modifier = Modifier.fillMaxSize(),
                 contentAlignment = Alignment.Center
             ) {
                 Text(
-                    "暂无方案，请先描述你的需求",
+                    "?????????????",
                     style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
                 )
             }
         } else {
-            // 方案内容
+            // ????
             Column(
                 modifier = Modifier
                     .weight(1f)
@@ -74,7 +73,7 @@ fun PlanScreen(
                 Spacer(modifier = Modifier.height(16.dp))
             }
 
-            // 底部按钮
+            // ????
             Surface(
                 color = MaterialTheme.colorScheme.surface,
                 shadowElevation = 8.dp
@@ -89,7 +88,7 @@ fun PlanScreen(
                         modifier = Modifier.fillMaxWidth().height(52.dp),
                         enabled = !isGenerating,
                         shape = RoundedCornerShape(14.dp),
-                        colors = ButtonDefaults.buttonColors(containerColor = BluePrimary)
+                        colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
                     ) {
                         if (isGenerating) {
                             CircularProgressIndicator(
@@ -98,10 +97,10 @@ fun PlanScreen(
                                 color = MaterialTheme.colorScheme.onPrimary
                             )
                             Spacer(modifier = Modifier.width(12.dp))
-                            Text("正在生成应用...", style = MaterialTheme.typography.labelLarge)
+                            Text("??????...", style = MaterialTheme.typography.labelLarge)
                         } else {
                             Text(
-                                "确认生成",
+                                "????",
                                 style = MaterialTheme.typography.labelLarge.copy(
                                     fontWeight = FontWeight.Bold
                                 )
@@ -114,7 +113,7 @@ fun PlanScreen(
                         modifier = Modifier.fillMaxWidth().height(48.dp),
                         shape = RoundedCornerShape(14.dp)
                     ) {
-                        Text("调整需求", style = MaterialTheme.typography.labelLarge)
+                        Text("????", style = MaterialTheme.typography.labelLarge)
                     }
                 }
             }

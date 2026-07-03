@@ -17,7 +17,7 @@ object AiServiceFactory {
         )
 
         if (config.demoMode || !config.hasUsableKey) {
-            Log.i(FACTORY_TAG, "使用演示模式 AI 服务")
+            Log.i(FACTORY_TAG, "?????? AI ??")
             return MockAiService()
         }
 
@@ -25,7 +25,7 @@ object AiServiceFactory {
             "vivo", "deepseek" -> RealAiService(config)
             "mock" -> MockAiService()
             else -> {
-                Log.w(FACTORY_TAG, "未知 AI provider=${config.provider}，使用 Mock")
+                Log.w(FACTORY_TAG, "?? AI provider=${config.provider}??? Mock")
                 MockAiService()
             }
         }

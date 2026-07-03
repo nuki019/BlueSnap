@@ -8,13 +8,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.bluesnap.data.ChatMessage
 import com.example.bluesnap.data.Role
-import com.example.bluesnap.ui.theme.AiBubble
-import com.example.bluesnap.ui.theme.UserBubble
 
 @Composable
 fun MessageBubble(
@@ -22,7 +19,16 @@ fun MessageBubble(
     modifier: Modifier = Modifier
 ) {
     val isUser = message.role == Role.USER
-    val bubbleColor = if (isUser) UserBubble else AiBubble
+    val bubbleColor = if (isUser) {
+        MaterialTheme.colorScheme.primaryContainer
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
+    val textColor = if (isUser) {
+        MaterialTheme.colorScheme.onPrimaryContainer
+    } else {
+        MaterialTheme.colorScheme.onSurfaceVariant
+    }
     val alignment = if (isUser) Arrangement.End else Arrangement.Start
     val shape = if (isUser) {
         RoundedCornerShape(20.dp, 4.dp, 20.dp, 20.dp)
@@ -39,9 +45,9 @@ fun MessageBubble(
         Column(
             modifier = Modifier.widthIn(max = 280.dp)
         ) {
-            // 角色标签
+            // ????
             Text(
-                text = if (isUser) "你" else "蓝心快搭",
+                text = if (isUser) "?" else "????",
                 style = MaterialTheme.typography.labelSmall,
                 color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
                 modifier = Modifier.padding(
@@ -50,7 +56,7 @@ fun MessageBubble(
                     bottom = 2.dp
                 )
             )
-            // 气泡内容
+            // ????
             Text(
                 text = message.content,
                 modifier = Modifier
@@ -61,7 +67,7 @@ fun MessageBubble(
                     fontSize = 15.sp,
                     lineHeight = 22.sp
                 ),
-                color = MaterialTheme.colorScheme.onSurface
+                color = textColor
             )
         }
     }

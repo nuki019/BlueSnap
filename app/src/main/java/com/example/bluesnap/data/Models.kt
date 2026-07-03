@@ -22,7 +22,7 @@ data class AppPlan(
     val description: String,
     val features: List<Feature>,
     val layoutIndex: Int = 0,
-    val layouts: List<String> = listOf("简约风格", "卡片风格", "拟物风格")
+    val layouts: List<String> = listOf("????", "????", "????")
 )
 
 data class GeneratedApp(
@@ -30,18 +30,29 @@ data class GeneratedApp(
     val name: String,
     val description: String,
     val htmlContent: String,
+    val summary: String = description,
+    val imagePrompt: String? = null,
+    val audioPrompt: String? = null,
     val createdAt: Long = System.currentTimeMillis()
 )
 
-enum class Screen { HOME, CHAT, PLAN, PREVIEW }
+data class GenerationBundle(
+    val html: String,
+    val summary: String = "",
+    val imagePrompt: String? = null,
+    val audioPrompt: String? = null
+)
+
+enum class Screen { HOME, HISTORY, CHAT, PLAN, PREVIEW, SHARE }
 
 data class AppState(
     val messages: List<ChatMessage> = emptyList(),
     val currentPlan: AppPlan? = null,
     val isGenerating: Boolean = false,
-    /** 流式输出中 AI 正在生成的内容（尚未成为完整消息） */
+    /** ????? AI ????????????????? */
     val streamingContent: String = "",
     val generatedApp: GeneratedApp? = null,
     val savedApps: List<GeneratedApp> = emptyList(),
-    val currentScreen: Screen = Screen.HOME
+    val currentScreen: Screen = Screen.HOME,
+    val previewReturnScreen: Screen = Screen.HOME
 )

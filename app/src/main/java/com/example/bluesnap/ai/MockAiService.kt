@@ -12,14 +12,14 @@ class MockAiService : AiService {
         val lastUser = messages.lastOrNull { it.role == Role.USER }?.content ?: ""
         val detected = detectAppType(lastUser)
         val reply = if (detected != null) {
-            "好的！我来帮你做一个「${detected.first}」。\n\n" +
+            "???????????${detected.first}??\n\n" +
             "${detected.second}\n\n" +
-            "我已经为你规划好了方案，点击下方按钮查看详细设计，确认后即可一键生成。"
+            "???????????????????????????????????"
         } else {
-            "收到你的需求！让我来分析一下：\n\n" +
-            "根据你的描述，我理解你需要一个自定义工具。我会基于蓝心大模型的能力，" +
-            "为你设计功能方案并生成可直接运行的应用。\n\n" +
-            "你也可以试试这些常见需求：番茄钟、待办清单、备忘录、记账本、习惯打卡"
+            "???????????????\n\n" +
+            "??????????????????????????????????" +
+            "????????????????????\n\n" +
+            "??????????????????????????????????????????????"
         }
         return ChatMessage(role = Role.ASSISTANT, content = reply)
     }
@@ -28,16 +28,16 @@ class MockAiService : AiService {
         val lastUser = messages.lastOrNull { it.role == Role.USER }?.content ?: ""
         val detected = detectAppType(lastUser)
         val fullText = if (detected != null) {
-            "好的！我来帮你做一个「${detected.first}」。\n\n" +
+            "???????????${detected.first}??\n\n" +
             "${detected.second}\n\n" +
-            "我已经为你规划好了方案，点击下方按钮查看详细设计，确认后即可一键生成。"
+            "???????????????????????????????????"
         } else {
-            "收到你的需求！让我来分析一下：\n\n" +
-            "根据你的描述，我理解你需要一个自定义工具。我会基于蓝心大模型的能力，" +
-            "为你设计功能方案并生成可直接运行的应用。\n\n" +
-            "你也可以试试这些常见需求：番茄钟、待办清单、备忘录、记账本、习惯打卡"
+            "???????????????\n\n" +
+            "??????????????????????????????????" +
+            "????????????????????\n\n" +
+            "??????????????????????????????????????????????"
         }
-        // 模拟逐字输出
+        // ??????
         val buffer = StringBuilder()
         for (char in fullText) {
             buffer.append(char)
@@ -50,134 +50,401 @@ class MockAiService : AiService {
         delay(500)
         val lastUser = chatHistory.lastOrNull { it.role == Role.USER }?.content ?: ""
         val detected = detectAppType(lastUser)
-        return detected?.let { plans[it.first] } ?: plans["通用工具"]!!
+        return detected?.let { plans[it.first] } ?: plans["????"]!!
     }
 
     override suspend fun generateHtml(plan: AppPlan, chatHistory: List<ChatMessage>): String {
         delay(1200)
-        return htmlTemplates[plan.name] ?: htmlTemplates["通用工具"]!!
+        return htmlTemplates[plan.name] ?: htmlTemplates["????"]!!
     }
 
-    // ── 意图识别 ──────────────────────────────────────────────────────
+    override suspend fun generateBundle(plan: AppPlan, chatHistory: List<ChatMessage>): GenerationBundle {
+        delay(1200)
+        val html = htmlTemplates[plan.name] ?: htmlTemplates["????"]!!
+        return GenerationBundle(
+            html = html,
+            summary = plan.description,
+            imagePrompt = mediaPrompts[plan.name]?.first,
+            audioPrompt = mediaPrompts[plan.name]?.second
+        )
+    }
+
+    // ?? ???? ??????????????????????????????????????????????????????
 
     private fun detectAppType(input: String): Pair<String, String>? {
         val lower = input.lowercase()
         return when {
-            lower.contains("活动") || lower.contains("社团") || lower.contains("报名") ||
-                lower.contains("分工") || lower.contains("预算") || lower.contains("筹备") ->
-                "活动筹备" to "这是一个面向社团负责人和班委的活动筹备助手，支持报名名单、任务分工、预算记录和进度打卡。"
-            lower.contains("番茄") || lower.contains("pomodoro") || lower.contains("计时") || lower.contains("倒计时") ->
-                "番茄钟" to "这是一个25分钟番茄工作法计时器，支持专注倒计时、白噪音、每日专注统计等功能。"
-            lower.contains("待办") || lower.contains("todo") || lower.contains("清单") || lower.contains("任务") ->
-                "待办清单" to "这是一个任务管理工具，支持添加、完成、删除待办事项，数据本地持久化保存。"
-            lower.contains("备忘") || lower.contains("记事") || lower.contains("笔记") || lower.contains("memo") ->
-                "备忘录" to "这是一个轻量备忘录应用，支持快速记录、搜索、本地存储。"
-            lower.contains("记账") || lower.contains("账本") || lower.contains("消费") || lower.contains("花销") ->
-                "记账本" to "这是一个个人记账工具，支持收入/支出记录、分类统计、月度汇总。"
-            lower.contains("打卡") || lower.contains("习惯") || lower.contains("habit") || lower.contains("坚持") ->
-                "习惯打卡" to "这是一个习惯养成工具，支持多习惯管理、连续打卡天数追踪、日历视图。"
+            lower.contains("????") || lower.contains("??") || lower.contains("???") ||
+                lower.contains("mindmap") || lower.contains("mind map") ->
+                "??????" to "?????????????????????????????????????????????????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("??") ||
+                lower.contains("??") || lower.contains("??") ->
+                "????" to "??????????????????????????????????????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("ddl") ||
+                lower.contains("??") ->
+                "?????" to "??????????????????DDL ??????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("??") || lower.contains("???") ->
+                "????" to "??????????????????????????????????"
+            lower.contains("??") || lower.contains("todo") || lower.contains("??") ->
+                "?????" to "??????????????????DDL ??????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("??") ||
+                lower.contains("??") || lower.contains("??") || lower.contains("??") ->
+                "?????" to "??????????????????????????????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("??") || lower.contains("memo") ->
+                "???" to "???????????????????????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("??") ||
+                lower.contains("??") || lower.contains("??") || lower.contains("??") ->
+                "????" to "??????????????????????????????????"
+            lower.contains("??") || lower.contains("??") || lower.contains("habit") || lower.contains("??") ->
+                "????" to "?????????????????????????????????"
+            lower.contains("??") || lower.contains("pomodoro") || lower.contains("??") || lower.contains("???") ->
+                "???" to "????25?????????????????????????????????"
             else -> null
         }
     }
 
-    // ── 方案库 ────────────────────────────────────────────────────────
+    // ?? ??? ????????????????????????????????????????????????????????
 
     private val plans = mapOf(
-        "活动筹备" to AppPlan(
-            name = "活动筹备",
-            description = "社团活动报名、分工、预算和进度管理工具",
+        "????" to AppPlan(
+            name = "????",
+            description = "???????????????????",
             features = listOf(
-                Feature("报名名单", "快速记录参与者姓名和联系方式"),
-                Feature("任务分工", "按负责人追踪活动准备事项"),
-                Feature("预算记录", "记录支出项目并自动汇总金额"),
-                Feature("进度打卡", "一键标记筹备任务完成状态")
+                Feature("????", "??????????????"),
+                Feature("????", "????????????"),
+                Feature("????", "?????????????"),
+                Feature("????", "????????????")
             )
         ),
-        "番茄钟" to AppPlan(
-            name = "番茄钟",
-            description = "25分钟专注工作法计时器",
+        "?????" to AppPlan(
+            name = "?????",
+            description = "?????? DDL ???????",
             features = listOf(
-                Feature("25分钟倒计时", "核心计时功能，到时自动提醒"),
-                Feature("白噪音播放", "提供雨声/海浪/篝火三种环境音"),
-                Feature("专注统计", "记录每日专注次数和总时长"),
-                Feature("自定义时长", "支持调整单次专注时长")
+                Feature("????", "????????????"),
+                Feature("DDL ??", "???????????"),
+                Feature("????", "??????????????"),
+                Feature("????", "????????????")
             )
         ),
-        "待办清单" to AppPlan(
-            name = "待办清单",
-            description = "简洁高效的任务管理工具",
+        "????" to AppPlan(
+            name = "????",
+            description = "???????????????",
             features = listOf(
-                Feature("添加待办", "输入任务内容快速添加"),
-                Feature("完成标记", "点击勾选完成状态"),
-                Feature("删除任务", "左滑删除不需要的任务"),
-                Feature("本地存储", "关闭后数据不丢失")
+                Feature("????", "???????????"),
+                Feature("????", "??????????"),
+                Feature("????", "??????????"),
+                Feature("????", "???????????")
             )
         ),
-        "备忘录" to AppPlan(
-            name = "备忘录",
-            description = "轻量快速的记录工具",
+        "?????" to AppPlan(
+            name = "?????",
+            description = "?????????????",
             features = listOf(
-                Feature("快速记录", "支持多条备忘录创建"),
-                Feature("内容搜索", "关键词快速检索"),
-                Feature("时间排序", "按创建时间自动排列"),
-                Feature("本地存储", "所有数据安全保存在本地")
+                Feature("????", "????????????"),
+                Feature("????", "???????????? offer"),
+                Feature("????", "???????????"),
+                Feature("????", "????????????")
             )
         ),
-        "记账本" to AppPlan(
-            name = "记账本",
-            description = "个人收支记录与统计工具",
+        "????" to AppPlan(
+            name = "????",
+            description = "?????????????",
             features = listOf(
-                Feature("收支记录", "快速录入金额和分类"),
-                Feature("分类统计", "按类别查看消费占比"),
-                Feature("月度汇总", "查看本月收支总览"),
-                Feature("历史记录", "查看所有记账记录")
+                Feature("????", "????????????"),
+                Feature("????", "?????????????"),
+                Feature("????", "???????????"),
+                Feature("????", "?????????")
             )
         ),
-        "习惯打卡" to AppPlan(
-            name = "习惯打卡",
-            description = "好习惯养成追踪工具",
+        "??????" to AppPlan(
+            name = "??????",
+            description = "?????????????????????",
             features = listOf(
-                Feature("习惯管理", "创建多个自定义习惯"),
-                Feature("每日打卡", "一键完成当日打卡"),
-                Feature("连续天数", "追踪连续打卡天数"),
-                Feature("日历视图", "日历上直观查看打卡记录")
+                Feature("????", "???????????????"),
+                Feature("????", "????????????"),
+                Feature("????", "????????????????"),
+                Feature("????", "????????????")
             )
         ),
-        "通用工具" to AppPlan(
-            name = "通用工具",
-            description = "自定义轻量工具",
+        "???" to AppPlan(
+            name = "???",
+            description = "25??????????",
             features = listOf(
-                Feature("核心功能", "基于你的需求自动生成"),
-                Feature("简洁界面", "清爽直观的移动端界面"),
-                Feature("数据存储", "本地持久化保存"),
-                Feature("一键生成", "即开即用无需安装")
+                Feature("25?????", "?????????????"),
+                Feature("?????", "????/??/???????"),
+                Feature("????", "????????????"),
+                Feature("?????", "??????????")
+            )
+        ),
+        "????" to AppPlan(
+            name = "????",
+            description = "???????????",
+            features = listOf(
+                Feature("????", "??????????"),
+                Feature("????", "????????"),
+                Feature("????", "??????????"),
+                Feature("????", "????????")
+            )
+        ),
+        "???" to AppPlan(
+            name = "???",
+            description = "?????????",
+            features = listOf(
+                Feature("????", "?????????"),
+                Feature("????", "???????"),
+                Feature("????", "?????????"),
+                Feature("????", "???????????")
+            )
+        ),
+        "???" to AppPlan(
+            name = "???",
+            description = "???????????",
+            features = listOf(
+                Feature("????", "?????????"),
+                Feature("????", "?????????"),
+                Feature("????", "????????"),
+                Feature("????", "????????")
+            )
+        ),
+        "????" to AppPlan(
+            name = "????",
+            description = "?????????",
+            features = listOf(
+                Feature("????", "?????????"),
+                Feature("????", "????????"),
+                Feature("????", "????????"),
+                Feature("????", "???????????")
+            )
+        ),
+        "????" to AppPlan(
+            name = "????",
+            description = "???????????",
+            features = listOf(
+                Feature("????", "??????????"),
+                Feature("????", "??????????"),
+                Feature("????", "???????"),
+                Feature("????", "????????")
             )
         )
     )
 
-    // ── HTML模板库 ─────────────────────────────────────────────────────
+    // ?? HTML??? ?????????????????????????????????????????????????????
 
     private val htmlTemplates = mapOf(
-        "活动筹备" to eventHtml,
-        "番茄钟" to pomodoroHtml,
-        "待办清单" to todoHtml,
-        "备忘录" to memoHtml,
-        "记账本" to expenseHtml,
-        "习惯打卡" to habitHtml,
-        "通用工具" to genericHtml
+        "????" to eventHtml,
+        "?????" to courseBoardHtml,
+        "????" to groupWorkHtml,
+        "?????" to jobTrackerHtml,
+        "????" to lifeBudgetHtml,
+        "??????" to mindMapHtml,
+        "???" to pomodoroHtml,
+        "????" to todoHtml,
+        "???" to memoHtml,
+        "???" to expenseHtml,
+        "????" to habitHtml,
+        "????" to genericHtml
+    )
+
+    private val mediaPrompts = mapOf(
+        "????" to ("??????????????????????????????????????????" to "????????????????????"),
+        "??????" to ("????????????????????????????????????????????" to "????????????????????????")
     )
 }
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：活动筹备
-// ═══════════════════════════════════════════════════════════════════════
+private val courseBoardHtml = campusListHtml(
+    title = "?????",
+    icon = "??",
+    subtitle = "?????????? DDL ????????",
+    placeholder = "?????????????????",
+    seeds = listOf("???? DDL ??", "???? PPT", "??????")
+)
+
+private val groupWorkHtml = campusListHtml(
+    title = "????",
+    icon = "??",
+    subtitle = "????????????????????????",
+    placeholder = "???????????????",
+    seeds = listOf("???? - ??", "PPT ?? - ??", "???? - ??")
+)
+
+private val jobTrackerHtml = campusListHtml(
+    title = "?????",
+    icon = "??",
+    subtitle = "??????????????????",
+    placeholder = "??????????? ???? ???",
+    seeds = listOf("???? - ???", "???? - ????", "???? - ????")
+)
+
+private val lifeBudgetHtml = campusListHtml(
+    title = "????",
+    icon = "??",
+    subtitle = "???????????????????",
+    placeholder = "????????? 18 ?",
+    seeds = listOf("?? 18 ?", "???? 12 ?", "?? 6 ?")
+)
+
+private fun campusListHtml(
+    title: String,
+    icon: String,
+    subtitle: String,
+    placeholder: String,
+    seeds: List<String>
+): String {
+    val seedItems = seeds.joinToString(",") { "\"${it.escapeJsString()}\"" }
+    return """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>$title</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:#f6f8fc;color:#17233c;min-height:100vh;padding:18px}
+.hero{background:linear-gradient(135deg,#1a73e8,#13c2c2);color:#fff;border-radius:18px;padding:22px;margin-bottom:16px;box-shadow:0 10px 28px rgba(26,115,232,.2)}
+.hero h1{font-size:24px;margin-bottom:6px}.hero p{font-size:13px;opacity:.88;line-height:1.5}
+.panel{background:#fff;border-radius:14px;padding:14px;box-shadow:0 8px 24px rgba(15,35,75,.08);margin-bottom:12px}
+.row{display:flex;gap:8px}.row input{flex:1;border:1px solid #d9e2f1;border-radius:12px;padding:12px;font-size:14px;outline:none}
+.row button{border:0;border-radius:12px;background:#1a73e8;color:#fff;font-weight:700;padding:0 16px}
+.item{display:flex;align-items:center;justify-content:space-between;gap:10px;background:#f7f9fd;border-radius:12px;padding:12px;margin-top:10px}
+.item.done{opacity:.55}.item.done b{text-decoration:line-through}.item b{font-size:14px}.item span{font-size:12px;color:#6b7890}
+.item button{border:0;background:#ffe8e8;color:#d63031;border-radius:10px;width:34px;height:34px;font-size:18px}
+.empty{text-align:center;color:#8a96aa;padding:28px 0;font-size:14px}
+</style>
+</head>
+<body>
+<div class="hero"><h1>$icon $title</h1><p>$subtitle</p></div>
+<div class="panel">
+  <div class="row">
+    <input id="text" placeholder="$placeholder" onkeypress="if(event.key==='Enter')addItem()">
+    <button onclick="addItem()">??</button>
+  </div>
+  <div id="list"></div>
+</div>
+<script>
+var key='bluesnap_$title';
+var items=JSON.parse(localStorage.getItem(key)||'null')||[$seedItems];
+function save(){localStorage.setItem(key,JSON.stringify(items))}
+function render(){var list=document.getElementById('list');list.innerHTML='';if(!items.length){list.innerHTML='<div class="empty">?????????????</div>';return}items.forEach(function(item,index){var div=document.createElement('div');div.className='item '+(item.done?'done':'');div.innerHTML='<div onclick="toggleItem('+index+')"><b>'+item.text+'</b><br><span>'+(item.done?'???':'???')+'</span></div><button onclick="deleteItem('+index+')">?</button>';list.appendChild(div)})}
+function addItem(){var input=document.getElementById('text');var text=input.value.trim();if(!text)return;items.unshift({text:text,done:false});input.value='';save();render()}
+function toggleItem(index){items[index].done=!items[index].done;save();render()}
+function deleteItem(index){items.splice(index,1);save();render()}
+items=items.map(function(x){return typeof x==='string'?{text:x,done:false}:x});save();render();
+</script>
+</body>
+</html>
+""".trimIndent()
+}
+
+private fun String.escapeJsString(): String {
+    return replace("\\", "\\\\").replace("\"", "\\\"")
+}
+
+// ???????????????????????????????????????????????????????????????????????
+// HTML ?????????
+// ???????????????????????????????????????????????????????????????????????
+private val mindMapHtml = """
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<title>??????</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"PingFang SC",sans-serif;background:#f5f8fd;color:#17233c;min-height:100vh;padding:16px;padding-bottom:92px}
+.hero{background:#fff;border:1px solid #e3eaf6;border-radius:18px;padding:18px;box-shadow:0 8px 24px rgba(16,35,75,.06);margin-bottom:12px}
+.eyebrow{display:inline-flex;align-items:center;height:24px;border-radius:999px;background:#e8f1ff;color:#1a73e8;font-size:12px;font-weight:800;padding:0 10px;margin-bottom:10px}
+h1{font-size:24px;line-height:1.2;margin-bottom:6px}.sub{font-size:13px;color:#667085;line-height:1.6}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:14px}.stat{background:#f7faff;border-radius:12px;padding:10px;text-align:center}.stat b{display:block;font-size:18px}.stat span{font-size:11px;color:#667085}
+.toolbar{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0}.toolbar button,.bar button{border:0;border-radius:12px;background:#1a73e8;color:#fff;font-weight:800;min-height:42px}
+.toolbar button.secondary{background:#eef4ff;color:#1a73e8}.toolbar button.ghost{background:#fff;color:#475467;border:1px solid #dbe5f3}
+.panel{background:#fff;border:1px solid #e3eaf6;border-radius:18px;padding:12px;box-shadow:0 8px 24px rgba(16,35,75,.06)}
+.node{position:relative;background:#f8fbff;border:1px solid #e2eaf6;border-radius:14px;margin:8px 0;padding:10px 10px 10px 12px}
+.node:before{content:"";position:absolute;left:-8px;top:22px;width:8px;height:1px;background:#c8d6eb}
+.node.level0{background:linear-gradient(135deg,#1a73e8,#13a8c8);color:#fff;border:0}.node.level0:before{display:none}
+.row{display:flex;align-items:center;gap:8px}.title{flex:1;min-width:0;font-size:15px;font-weight:800;border:0;background:transparent;color:inherit;outline:none}
+.note{width:100%;border:0;background:transparent;color:inherit;opacity:.72;outline:none;font-size:12px;margin-top:5px;resize:none;min-height:32px}
+.badge{font-size:11px;color:#1a73e8;background:#e8f1ff;border-radius:999px;padding:4px 8px;white-space:nowrap}.level0 .badge{background:rgba(255,255,255,.2);color:#fff}
+.iconbtn{width:32px;height:32px;border:0;border-radius:10px;background:#eef4ff;color:#1a73e8;font-weight:900}.level0 .iconbtn{background:rgba(255,255,255,.2);color:#fff}
+.children{margin-left:18px;border-left:1px solid #d8e3f3;padding-left:10px}.collapsed>.children{display:none}.collapsed>.row .toggle:after{content:"+"}.toggle:after{content:"-"}
+.bar{position:fixed;left:0;right:0;bottom:0;background:#fff;border-top:1px solid #e3eaf6;padding:12px 16px;display:flex;gap:8px;box-shadow:0 -8px 24px rgba(16,35,75,.08)}
+.bar input{flex:1;min-width:0;border:1px solid #d9e3f0;border-radius:12px;padding:0 12px;font-size:14px;outline:none}.bar input:focus{border-color:#1a73e8}
+.toast{position:fixed;left:50%;bottom:78px;transform:translateX(-50%);background:#17233c;color:#fff;padding:10px 14px;border-radius:999px;font-size:13px;opacity:0;pointer-events:none;transition:.2s}.toast.show{opacity:1}
+</style>
+</head>
+<body>
+<section class="hero">
+  <span class="eyebrow">MIND MAP</span>
+  <h1>??????</h1>
+  <p class="sub">???????????????????????????????????</p>
+  <div class="stats">
+    <div class="stat"><b id="total">0</b><span>??</span></div>
+    <div class="stat"><b id="depth">0</b><span>??</span></div>
+    <div class="stat"><b id="done">0</b><span>???</span></div>
+  </div>
+</section>
+<div class="toolbar">
+  <button onclick="addChild(root.id)">????</button>
+  <button class="secondary" onclick="copyOutline()">????</button>
+  <button class="ghost" onclick="resetMap()">????</button>
+</div>
+<main class="panel" id="map"></main>
+<div class="bar">
+  <input id="quick" placeholder="????????????" onkeypress="if(event.key==='Enter')quickAdd()">
+  <button onclick="quickAdd()">??</button>
+</div>
+<div class="toast" id="toast">???</div>
+<script>
+var storeKey='bluesnap_mind_map_v1';
+function seed(){return {id:1,title:'????????',note:'??????????????????',children:[
+  {id:2,title:'????',note:'???????????????????',children:[
+    {id:5,title:'????',note:'???????????',children:[]},
+    {id:6,title:'????',note:'DDL??????????',children:[]}
+  ]},
+  {id:3,title:'????',note:'???????? HTML',children:[
+    {id:7,title:'????',note:'?????????',children:[]},
+    {id:8,title:'????',note:'??????? HTML',children:[]}
+  ]},
+  {id:4,title:'????',note:'?????????????',children:[]}
+]}}
+var root=load();var selected=root.id;
+function load(){try{return JSON.parse(localStorage.getItem(storeKey))||seed()}catch(e){return seed()}}
+function save(){localStorage.setItem(storeKey,JSON.stringify(root));render()}
+function nextId(){var max=0;walk(root,function(n){if(n.id>max)max=n.id});return max+1}
+function walk(n,fn,level,parent){fn(n,level||0,parent||null);(n.children||[]).forEach(function(c){walk(c,fn,(level||0)+1,n)})}
+function find(id){var hit=null;walk(root,function(n){if(n.id===id)hit=n});return hit}
+function findParent(id){var hit=null;walk(root,function(n,l,p){if(n.id===id)hit=p});return hit}
+function addChild(id){var n=find(id)||root;n.children=n.children||[];n.children.push({id:nextId(),title:'???',note:'',children:[]});selected=n.children[n.children.length-1].id;save()}
+function quickAdd(){var input=document.getElementById('quick');var text=input.value.trim();if(!text)return;root.children.push({id:nextId(),title:text,note:'',children:[]});input.value='';save();toast('?????')}
+function removeNode(id){if(id===root.id)return toast('????????');var p=findParent(id);if(!p)return;p.children=p.children.filter(function(x){return x.id!==id});selected=root.id;save()}
+function indent(id){var p=findParent(id);if(!p)return;var list=p.children;var idx=list.findIndex(function(x){return x.id===id});if(idx<=0)return toast('?????????');var node=list.splice(idx,1)[0];list[idx-1].children.push(node);save()}
+function outdent(id){var p=findParent(id),gp=p?findParent(p.id):null;if(!p||!gp)return toast('?????');var node=find(id);if(!node)return;p.children=p.children.filter(function(x){return x.id!==id});var parentIndex=gp.children.findIndex(function(x){return x.id===p.id});gp.children.splice(parentIndex+1,0,node);save()}
+function toggle(id){var n=find(id);if(!n)return;n.collapsed=!n.collapsed;save()}
+function render(){var map=document.getElementById('map');map.innerHTML=nodeHtml(root,0);bindInputs();var count=0,depth=0;walk(root,function(n,l){count++;if(l+1>depth)depth=l+1});document.getElementById('total').textContent=count;document.getElementById('depth').textContent=depth;document.getElementById('done').textContent='HTML'}
+function nodeHtml(n,level){var child=(n.children||[]).map(function(c){return nodeHtml(c,level+1)}).join('');return '<section class="node level'+level+(n.collapsed?' collapsed':'')+'" data-id="'+n.id+'"><div class="row"><button class="iconbtn toggle" onclick="toggle('+n.id+')"></button><input class="title" value="'+esc(n.title)+'" data-field="title" data-id="'+n.id+'"><span class="badge">L'+(level+1)+'</span></div><textarea class="note" data-field="note" data-id="'+n.id+'" placeholder="????">'+esc(n.note||'')+'</textarea><div class="row" style="margin-top:8px"><button class="iconbtn" onclick="addChild('+n.id+')">+</button><button class="iconbtn" onclick="indent('+n.id+')">?</button><button class="iconbtn" onclick="outdent('+n.id+')">?</button><button class="iconbtn" onclick="removeNode('+n.id+')">?</button></div><div class="children">'+child+'</div></section>'}
+function bindInputs(){document.querySelectorAll('[data-field]').forEach(function(el){el.oninput=function(){var n=find(parseInt(el.dataset.id));if(n){n[el.dataset.field]=el.value;localStorage.setItem(storeKey,JSON.stringify(root))}}})}
+function outline(n,level){var pad='  '.repeat(level);var text=pad+'- '+n.title+(n.note?'?'+n.note:'')+'\n';(n.children||[]).forEach(function(c){text+=outline(c,level+1)});return text}
+function copyOutline(){var text=outline(root,0);if(navigator.clipboard){navigator.clipboard.writeText(text).then(function(){toast('?????')})}else{toast(text)}}
+function resetMap(){root=seed();selected=root.id;save();toast('?????')}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/"/g,'&quot;')}
+function toast(t){var el=document.getElementById('toast');el.textContent=t;el.classList.add('show');setTimeout(function(){el.classList.remove('show')},1500)}
+render();
+</script>
+</body>
+</html>
+""".trimIndent()
+
+// ???????????????????????????????????????????????????????????????????????
+// HTML ???????
+// ???????????????????????????????????????????????????????????????????????
 private val eventHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>活动筹备助手</title>
+<title>??????</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,"PingFang SC",sans-serif;background:#f4f7fb;color:#17233c;min-height:100vh;padding:18px;padding-bottom:28px}
@@ -211,32 +478,32 @@ button{min-height:44px;cursor:pointer}
 </head>
 <body>
 <section class="hero">
-<h1>🎯 活动筹备助手</h1>
-<p>给社团负责人和班委的一屏式工具：报名、分工、预算、进度都放在手机里。</p>
+<h1>??????</h1>
+<p>????????????????????????????????</p>
 <div class="stats">
-<div class="stat"><b id="peopleCount">0</b><span>报名人数</span></div>
-<div class="stat"><b id="taskCount">0</b><span>待办任务</span></div>
-<div class="stat"><b id="budgetTotal">¥0</b><span>预算支出</span></div>
+<div class="stat"><b id="peopleCount">0</b><span>????</span></div>
+<div class="stat"><b id="taskCount">0</b><span>????</span></div>
+<div class="stat"><b id="budgetTotal">?0</b><span>????</span></div>
 </div>
 </section>
 <nav class="tabs">
-<button class="tab active" onclick="showTab('people',this)">报名</button>
-<button class="tab" onclick="showTab('tasks',this)">分工</button>
-<button class="tab" onclick="showTab('budget',this)">预算</button>
+<button class="tab active" onclick="showTab('people',this)">??</button>
+<button class="tab" onclick="showTab('tasks',this)">??</button>
+<button class="tab" onclick="showTab('budget',this)">??</button>
 </nav>
 <section id="people" class="panel active">
-<div class="row"><input id="personName" placeholder="姓名"><input id="personPhone" placeholder="电话/微信"></div>
-<button class="primary" style="width:100%" onclick="addPerson()">添加报名</button>
+<div class="row"><input id="personName" placeholder="??"><input id="personPhone" placeholder="??/??"></div>
+<button class="primary" style="width:100%" onclick="addPerson()">????</button>
 <div id="peopleList"></div>
 </section>
 <section id="tasks" class="panel">
-<div class="row"><input id="taskName" placeholder="任务，如：借教室"><input id="ownerName" placeholder="负责人"></div>
-<button class="primary" style="width:100%" onclick="addTask()">添加分工</button>
+<div class="row"><input id="taskName" placeholder="????????"><input id="ownerName" placeholder="???"></div>
+<button class="primary" style="width:100%" onclick="addTask()">????</button>
 <div id="taskList"></div>
 </section>
 <section id="budget" class="panel">
-<div class="row"><input id="budgetName" placeholder="支出项目"><input id="budgetAmount" type="number" placeholder="金额"></div>
-<button class="primary" style="width:100%" onclick="addBudget()">记录预算</button>
+<div class="row"><input id="budgetName" placeholder="????"><input id="budgetAmount" type="number" placeholder="??"></div>
+<button class="primary" style="width:100%" onclick="addBudget()">????</button>
 <div id="budgetList"></div>
 </section>
 <script>
@@ -244,28 +511,28 @@ var state=JSON.parse(localStorage.getItem('eventHelper')||'{"people":[],"tasks":
 function save(){localStorage.setItem('eventHelper',JSON.stringify(state));render()}
 function showTab(id,btn){document.querySelectorAll('.panel').forEach(function(p){p.classList.remove('active')});document.getElementById(id).classList.add('active');document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active')});btn.classList.add('active')}
 function addPerson(){var n=document.getElementById('personName').value.trim(),p=document.getElementById('personPhone').value.trim();if(!n)return;state.people.unshift({id:Date.now(),name:n,phone:p});document.getElementById('personName').value='';document.getElementById('personPhone').value='';save()}
-function addTask(){var n=document.getElementById('taskName').value.trim(),o=document.getElementById('ownerName').value.trim();if(!n)return;state.tasks.unshift({id:Date.now(),name:n,owner:o||'待分配',done:false});document.getElementById('taskName').value='';document.getElementById('ownerName').value='';save()}
+function addTask(){var n=document.getElementById('taskName').value.trim(),o=document.getElementById('ownerName').value.trim();if(!n)return;state.tasks.unshift({id:Date.now(),name:n,owner:o||'???',done:false});document.getElementById('taskName').value='';document.getElementById('ownerName').value='';save()}
 function addBudget(){var n=document.getElementById('budgetName').value.trim(),a=parseFloat(document.getElementById('budgetAmount').value);if(!n||!a)return;state.budgets.unshift({id:Date.now(),name:n,amount:a});document.getElementById('budgetName').value='';document.getElementById('budgetAmount').value='';save()}
 function del(type,id){state[type]=state[type].filter(function(x){return x.id!==id});save()}
 function toggleTask(id){var t=state.tasks.find(function(x){return x.id===id});if(t)t.done=!t.done;save()}
-function render(){var total=state.budgets.reduce(function(s,x){return s+x.amount},0),open=state.tasks.filter(function(t){return !t.done}).length;document.getElementById('peopleCount').textContent=state.people.length;document.getElementById('taskCount').textContent=open;document.getElementById('budgetTotal').textContent='¥'+total.toFixed(0);renderList('peopleList',state.people,'people');renderList('taskList',state.tasks,'tasks');renderList('budgetList',state.budgets,'budgets')}
-function renderList(id,items,type){var el=document.getElementById(id);if(!items.length){el.innerHTML='<div class="empty">暂无记录</div>';return}el.innerHTML='';items.forEach(function(x){var html='',cls='item';if(type==='people')html='<div class="item-main"><b>'+x.name+'</b><p>'+x.phone+'</p></div><span class="chip">已报名</span>';if(type==='tasks'){cls+=' '+(x.done?'done':'');html='<div class="item-main" onclick="toggleTask('+x.id+')"><b>'+x.name+'</b><p>负责人：'+x.owner+'</p></div><span class="chip">'+(x.done?'完成':'待办')+'</span>'}if(type==='budgets')html='<div class="item-main"><b>'+x.name+'</b><p>活动预算记录</p></div><span class="money">¥'+x.amount.toFixed(0)+'</span>';el.innerHTML+='<div class="'+cls+'">'+html+'<button class="danger" onclick="del(\''+type+'\','+x.id+')">×</button></div>'})}
+function render(){var total=state.budgets.reduce(function(s,x){return s+x.amount},0),open=state.tasks.filter(function(t){return !t.done}).length;document.getElementById('peopleCount').textContent=state.people.length;document.getElementById('taskCount').textContent=open;document.getElementById('budgetTotal').textContent='?'+total.toFixed(0);renderList('peopleList',state.people,'people');renderList('taskList',state.tasks,'tasks');renderList('budgetList',state.budgets,'budgets')}
+function renderList(id,items,type){var el=document.getElementById(id);if(!items.length){el.innerHTML='<div class="empty">????</div>';return}el.innerHTML='';items.forEach(function(x){var html='',cls='item';if(type==='people')html='<div class="item-main"><b>'+x.name+'</b><p>'+x.phone+'</p></div><span class="chip">???</span>';if(type==='tasks'){cls+=' '+(x.done?'done':'');html='<div class="item-main" onclick="toggleTask('+x.id+')"><b>'+x.name+'</b><p>????'+x.owner+'</p></div><span class="chip">'+(x.done?'??':'??')+'</span>'}if(type==='budgets')html='<div class="item-main"><b>'+x.name+'</b><p>??????</p></div><span class="money">?'+x.amount.toFixed(0)+'</span>';el.innerHTML+='<div class="'+cls+'">'+html+'<button class="danger" onclick="del(\''+type+'\','+x.id+')">?</button></div>'})}
 render();
 </script>
 </body>
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：番茄钟
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ??????
+// ???????????????????????????????????????????????????????????????????????
 private val pomodoroHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>番茄钟</title>
+<title>???</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;flex-direction:column;align-items:center;color:#fff;padding:20px}
@@ -289,32 +556,32 @@ h1{font-size:22px;margin-bottom:8px;letter-spacing:2px}
 </style>
 </head>
 <body>
-<h1>🍅 番茄钟</h1>
-<p class="subtitle">专注25分钟，高效一整天</p>
+<h1>???</h1>
+<p class="subtitle">??25????????</p>
 <div class="timer-ring">
 <div class="time" id="timer">25:00</div>
 </div>
 <div class="sound-bar">
-<button class="sound-btn" onclick="setSound('none')">静音</button>
-<button class="sound-btn" onclick="setSound('rain')">🌧 雨声</button>
-<button class="sound-btn" onclick="setSound('waves')">🌊 海浪</button>
-<button class="sound-btn" onclick="setSound('fire')">🔥 篝火</button>
+<button class="sound-btn" onclick="setSound('none')">??</button>
+<button class="sound-btn" onclick="setSound('rain')">??</button>
+<button class="sound-btn" onclick="setSound('waves')">??</button>
+<button class="sound-btn" onclick="setSound('fire')">??</button>
 </div>
 <div class="controls">
-<button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">开始专注</button>
-<button class="btn btn-secondary" onclick="resetTimer()">重置</button>
+<button class="btn btn-primary" id="startBtn" onclick="toggleTimer()">????</button>
+<button class="btn btn-secondary" onclick="resetTimer()">??</button>
 </div>
 <div class="stats">
-<div class="stat-row"><span class="stat-label">今日专注次数</span><span class="stat-value" id="sessions">0 次</span></div>
-<div class="stat-row"><span class="stat-label">今日专注时长</span><span class="stat-value" id="totalTime">0 分钟</span></div>
-<div class="stat-row"><span class="stat-label">当前模式</span><span class="stat-value" id="mode">专注模式</span></div>
+<div class="stat-row"><span class="stat-label">??????</span><span class="stat-value" id="sessions">0 ?</span></div>
+<div class="stat-row"><span class="stat-label">??????</span><span class="stat-value" id="totalTime">0 ??</span></div>
+<div class="stat-row"><span class="stat-label">????</span><span class="stat-value" id="mode">????</span></div>
 </div>
 <script>
 let time=25*60,running=false,interval=null,sessions=0,totalMinutes=0,sound='none';
 const timerEl=document.getElementById('timer'),startBtn=document.getElementById('startBtn');
 function updateDisplay(){const m=Math.floor(time/60),s=time%60;timerEl.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s}
-function toggleTimer(){if(running){clearInterval(interval);running=false;startBtn.textContent='继续专注'}else{running=true;startBtn.textContent='暂停';interval=setInterval(()=>{if(time>0){time--;updateDisplay()}else{clearInterval(interval);running=false;sessions++;totalMinutes+=25;document.getElementById('sessions').textContent=sessions+' 次';document.getElementById('totalTime').textContent=totalMinutes+' 分钟';startBtn.textContent='开始专注';time=25*60;updateDisplay();if(navigator.vibrate)navigator.vibrate(500)}},1000)}}
-function resetTimer(){clearInterval(interval);running=false;time=25*60;updateDisplay();startBtn.textContent='开始专注'}
+function toggleTimer(){if(running){clearInterval(interval);running=false;startBtn.textContent='????'}else{running=true;startBtn.textContent='??';interval=setInterval(()=>{if(time>0){time--;updateDisplay()}else{clearInterval(interval);running=false;sessions++;totalMinutes+=25;document.getElementById('sessions').textContent=sessions+' ?';document.getElementById('totalTime').textContent=totalMinutes+' ??';startBtn.textContent='????';time=25*60;updateDisplay();if(navigator.vibrate)navigator.vibrate(500)}},1000)}}
+function resetTimer(){clearInterval(interval);running=false;time=25*60;updateDisplay();startBtn.textContent='????'}
 function setSound(s){sound=s;document.querySelectorAll('.sound-btn').forEach(b=>b.classList.remove('active'));event.target.classList.add('active')}
 updateDisplay();
 </script>
@@ -322,16 +589,16 @@ updateDisplay();
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：待办清单
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ???????
+// ???????????????????????????????????????????????????????????????????????
 private val todoHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>待办清单</title>
+<title>????</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:#f5f5f5;min-height:100vh;padding:20px;padding-bottom:100px}
@@ -347,7 +614,7 @@ h1{font-size:24px;color:#1a1a2e}
 .todo-item.done .todo-text{text-decoration:line-through;color:#999}
 .checkbox{width:24px;height:24px;border-radius:50%;border:2px solid #ddd;cursor:pointer;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:all .3s}
 .checkbox.checked{background:#1a73e8;border-color:#1a73e8}
-.checkbox.checked::after{content:'✓';color:#fff;font-size:14px}
+.checkbox.checked::after{content:'?';color:#fff;font-size:14px}
 .todo-text{flex:1;font-size:15px;color:#333}
 .delete-btn{color:#ccc;font-size:18px;cursor:pointer;padding:4px 8px}
 .delete-btn:hover{color:#e74c3c}
@@ -358,18 +625,18 @@ h1{font-size:24px;color:#1a1a2e}
 </head>
 <body>
 <div class="header">
-<h1>📝 待办清单</h1>
-<span class="count" id="count">0 项</span>
+<h1>????</h1>
+<span class="count" id="count">0 ?</span>
 </div>
 <div id="list"></div>
 <div style="text-align:center;padding:40px;color:#999" id="empty">
-<div class="empty-icon">📋</div>
-<p>还没有待办事项</p>
-<p style="font-size:13px;margin-top:8px">在下方输入框添加你的第一个任务</p>
+<div class="empty-icon">TODO</div>
+<p>???????</p>
+<p style="font-size:13px;margin-top:8px">???????????????</p>
 </div>
 <div class="input-bar">
-<input id="input" placeholder="添加新任务..." onkeypress="if(event.key==='Enter')addTodo()">
-<button onclick="addTodo()">添加</button>
+<input id="input" placeholder="?????..." onkeypress="if(event.key==='Enter')addTodo()">
+<button onclick="addTodo()">??</button>
 </div>
 <script>
 let todos=JSON.parse(localStorage.getItem('todos')||'[]');
@@ -377,23 +644,23 @@ function save(){localStorage.setItem('todos',JSON.stringify(todos));render()}
 function addTodo(){const v=document.getElementById('input').value.trim();if(!v)return;todos.unshift({text:v,done:false,id:Date.now()});document.getElementById('input').value='';save()}
 function toggle(id){const t=todos.find(t=>t.id===id);if(t)t.done=!t.done;save()}
 function del(id){todos=todos.filter(t=>t.id!==id);save()}
-function render(){var list=document.getElementById('list'),empty=document.getElementById('empty'),count=document.getElementById('count');list.innerHTML='';var active=todos.filter(function(x){return !x.done});count.textContent=active.length+' 项';empty.style.display=todos.length?'none':'block';todos.forEach(function(t){var d=document.createElement('div');d.className='todo-item'+(t.done?' done':'');d.innerHTML='<div class="checkbox '+(t.done?'checked':'')+'" onclick="toggle('+t.id+')"></div><span class="todo-text">'+t.text+'</span><span class="delete-btn" onclick="del('+t.id+')">×</span>';list.appendChild(d)})}
+function render(){var list=document.getElementById('list'),empty=document.getElementById('empty'),count=document.getElementById('count');list.innerHTML='';var active=todos.filter(function(x){return !x.done});count.textContent=active.length+' ?';empty.style.display=todos.length?'none':'block';todos.forEach(function(t){var d=document.createElement('div');d.className='todo-item'+(t.done?' done':'');d.innerHTML='<div class="checkbox '+(t.done?'checked':'')+'" onclick="toggle('+t.id+')"></div><span class="todo-text">'+t.text+'</span><span class="delete-btn" onclick="del('+t.id+')">?</span>';list.appendChild(d)})}
 render();
 </script>
 </body>
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：备忘录
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ??????
+// ???????????????????????????????????????????????????????????????????????
 private val memoHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>备忘录</title>
+<title>???</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:#fafafa;min-height:100vh;padding:20px;padding-bottom:80px}
@@ -419,17 +686,17 @@ h1{font-size:24px;color:#333;margin-bottom:16px}
 </style>
 </head>
 <body>
-<h1>📒 备忘录</h1>
-<input class="search" placeholder="搜索备忘录..." oninput="render(this.value)">
+<h1>???</h1>
+<input class="search" placeholder="?????..." oninput="render(this.value)">
 <div id="list"></div>
 <button class="add-btn" onclick="openModal()">+</button>
 <div class="modal" id="modal">
 <div class="modal-content">
-<input id="titleInput" placeholder="标题">
-<textarea id="bodyInput" placeholder="写下你的想法..."></textarea>
+<input id="titleInput" placeholder="??">
+<textarea id="bodyInput" placeholder="??????..."></textarea>
 <div class="modal-btns">
-<button class="btn-cancel" onclick="closeModal()">取消</button>
-<button class="btn-save" onclick="saveMemo()">保存</button>
+<button class="btn-cancel" onclick="closeModal()">??</button>
+<button class="btn-save" onclick="saveMemo()">??</button>
 </div>
 </div>
 </div>
@@ -437,25 +704,25 @@ h1{font-size:24px;color:#333;margin-bottom:16px}
 let memos=JSON.parse(localStorage.getItem('memos')||'[]');
 function openModal(){document.getElementById('modal').classList.add('show');document.getElementById('titleInput').value='';document.getElementById('bodyInput').value=''}
 function closeModal(){document.getElementById('modal').classList.remove('show')}
-function saveMemo(){const t=document.getElementById('titleInput').value.trim()||'未命名',b=document.getElementById('bodyInput').value.trim();if(!b)return;memos.unshift({title:t,body:b,time:new Date().toLocaleString('zh-CN'),id:Date.now()});localStorage.setItem('memos',JSON.stringify(memos));closeModal();render()}
+function saveMemo(){const t=document.getElementById('titleInput').value.trim()||'???',b=document.getElementById('bodyInput').value.trim();if(!b)return;memos.unshift({title:t,body:b,time:new Date().toLocaleString('zh-CN'),id:Date.now()});localStorage.setItem('memos',JSON.stringify(memos));closeModal();render()}
 function delMemo(id){memos=memos.filter(m=>m.id!==id);localStorage.setItem('memos',JSON.stringify(memos));render()}
-function render(q){q=q||'';var list=document.getElementById('list');list.innerHTML='';var filtered=q?memos.filter(function(x){return x.title.includes(q)||x.body.includes(q)}):memos;filtered.forEach(function(m){list.innerHTML+='<div class="memo-card"><span class="memo-del" onclick="delMemo('+m.id+')">×</span><div class="memo-title">'+m.title+'</div><div class="memo-body">'+m.body+'</div><div class="memo-time">'+m.time+'</div></div>'})}
+function render(q){q=q||'';var list=document.getElementById('list');list.innerHTML='';var filtered=q?memos.filter(function(x){return x.title.includes(q)||x.body.includes(q)}):memos;filtered.forEach(function(m){list.innerHTML+='<div class="memo-card"><span class="memo-del" onclick="delMemo('+m.id+')">?</span><div class="memo-title">'+m.title+'</div><div class="memo-body">'+m.body+'</div><div class="memo-time">'+m.time+'</div></div>'})}
 render();
 </script>
 </body>
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：记账本
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ??????
+// ???????????????????????????????????????????????????????????????????????
 private val expenseHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>记账本</title>
+<title>???</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:#f0f2f5;min-height:100vh;padding-bottom:80px}
@@ -488,48 +755,48 @@ body{font-family:-apple-system,sans-serif;background:#f0f2f5;min-height:100vh;pa
 </head>
 <body>
 <div class="hero">
-<h1>💰 记账本</h1>
-<div class="balance" id="balance">¥0.00</div>
-<div class="balance-label">本月结余</div>
+<h1>???</h1>
+<div class="balance" id="balance">?0.00</div>
+<div class="balance-label">????</div>
 <div class="row">
-<div class="row-item"><div class="row-amount" id="income">¥0</div><div class="row-label">收入</div></div>
-<div class="row-item"><div class="row-amount" id="expense">¥0</div><div class="row-label">支出</div></div>
+<div class="row-item"><div class="row-amount" id="income">?0</div><div class="row-label">??</div></div>
+<div class="row-item"><div class="row-amount" id="expense">?0</div><div class="row-label">??</div></div>
 </div>
 </div>
 <div class="tabs">
-<button class="tab active" onclick="filter='all';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">全部</button>
-<button class="tab" onclick="filter='expense';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">支出</button>
-<button class="tab" onclick="filter='income';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">收入</button>
+<button class="tab active" onclick="filter='all';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">??</button>
+<button class="tab" onclick="filter='expense';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">??</button>
+<button class="tab" onclick="filter='income';render();document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));this.classList.add('active')">??</button>
 </div>
 <div id="list"></div>
 <div class="add-bar">
-<select id="type"><option value="expense">支出</option><option value="income">收入</option></select>
-<select id="cat"><option>餐饮</option><option>交通</option><option>购物</option><option>娱乐</option><option>工资</option><option>其他</option></select>
-<input id="amount" type="number" placeholder="金额" step="0.01">
-<button onclick="add()">记录</button>
+<select id="type"><option value="expense">??</option><option value="income">??</option></select>
+<select id="cat"><option>??</option><option>??</option><option>??</option><option>??</option><option>??</option><option>??</option></select>
+<input id="amount" type="number" placeholder="??" step="0.01">
+<button onclick="add()">??</button>
 </div>
 <script>
 let records=JSON.parse(localStorage.getItem('records')||'[]'),filter='all';
-const icons={餐饮:'🍔',交通:'🚌',购物:'🛒',娱乐:'🎮',工资:'💼',其他:'📌'};
+const icons={??:'?',??:'?',??:'?',??:'?',??:'?',??:'?'};
 function add(){const type=document.getElementById('type').value,cat=document.getElementById('cat').value,amount=parseFloat(document.getElementById('amount').value);if(!amount||amount<=0)return;records.unshift({type,cat,amount,time:new Date().toLocaleDateString('zh-CN'),id:Date.now()});localStorage.setItem('records',JSON.stringify(records));document.getElementById('amount').value='';render()}
 function del(id){records=records.filter(r=>r.id!==id);localStorage.setItem('records',JSON.stringify(records));render()}
-function render(){var list=document.getElementById('list');list.innerHTML='';var inc=0,exp=0;var filtered=filter==='all'?records:records.filter(function(r){return r.type===filter});filtered.forEach(function(r){if(r.type==='income')inc+=r.amount;else exp+=r.amount;list.innerHTML+='<div class="item"><div class="item-icon">'+(icons[r.cat]||'📌')+'</div><div class="item-info"><div class="item-cat">'+r.cat+'</div></div><span class="item-amount '+r.type+'">'+(r.type==='expense'?'-':'+')+'¥'+r.amount.toFixed(2)+'</span><span class="item-time">'+r.time+'</span><span style="cursor:pointer;color:#ccc;margin-left:8px" onclick="del('+r.id+')">×</span></div>'});document.getElementById('balance').textContent='¥'+(inc-exp).toFixed(2);document.getElementById('income').textContent='¥'+inc.toFixed(0);document.getElementById('expense').textContent='¥'+exp.toFixed(0)}
+function render(){var list=document.getElementById('list');list.innerHTML='';var inc=0,exp=0;var filtered=filter==='all'?records:records.filter(function(r){return r.type===filter});filtered.forEach(function(r){if(r.type==='income')inc+=r.amount;else exp+=r.amount;list.innerHTML+='<div class="item"><div class="item-icon">'+(icons[r.cat]||'?')+'</div><div class="item-info"><div class="item-cat">'+r.cat+'</div></div><span class="item-amount '+r.type+'">'+(r.type==='expense'?'-':'+')+'?'+r.amount.toFixed(2)+'</span><span class="item-time">'+r.time+'</span><span style="cursor:pointer;color:#ccc;margin-left:8px" onclick="del('+r.id+')">?</span></div>'});document.getElementById('balance').textContent='?'+(inc-exp).toFixed(2);document.getElementById('income').textContent='?'+inc.toFixed(0);document.getElementById('expense').textContent='?'+exp.toFixed(0)}
 render();
 </script>
 </body>
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：习惯打卡
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ???????
+// ???????????????????????????????????????????????????????????????????????
 private val habitHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>习惯打卡</title>
+<title>????</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:#f5f0eb;min-height:100vh;padding:20px;padding-bottom:80px}
@@ -556,12 +823,12 @@ h1{font-size:24px;color:#333;margin-bottom:4px}
 </style>
 </head>
 <body>
-<h1>🔥 习惯打卡</h1>
+<h1>????</h1>
 <p class="sub" id="dateSub"></p>
 <div id="list"></div>
 <div class="add-area">
-<input id="newHabit" placeholder="添加新习惯..." onkeypress="if(event.key==='Enter')addHabit()">
-<button onclick="addHabit()">添加</button>
+<input id="newHabit" placeholder="?????..." onkeypress="if(event.key==='Enter')addHabit()">
+<button onclick="addHabit()">??</button>
 </div>
 <script>
 let habits=JSON.parse(localStorage.getItem('habits')||'[]');
@@ -573,24 +840,24 @@ function addHabit(){const v=document.getElementById('newHabit').value.trim();if(
 function toggleDay(id){const h=habits.find(h=>h.id===id);if(!h)return;if(!h.days)h.days={};if(h.days[today])delete h.days[today];else h.days[today]=true;save()}
 function delHabit(id){habits=habits.filter(h=>h.id!==id);save()}
 function save(){localStorage.setItem('habits',JSON.stringify(habits));render()}
-function render(){const list=document.getElementById('list');list.innerHTML='';if(!habits.length){list.innerHTML='<div style="text-align:center;padding:60px;color:#999"><div style="font-size:48px;margin-bottom:12px">🌱</div><p>还没有习惯，添加一个开始吧</p></div>';return}
-habits.forEach(function(h){var streak=getStreak(h),doneToday=h.days&&h.days[today],weekDays=['一','二','三','四','五','六','日'],d=new Date(),dayOfWeek=d.getDay(),weekHtml=weekDays.map(function(w,i){var dd=new Date(d);dd.setDate(dd.getDate()-(dayOfWeek===0?6:dayOfWeek-1)+i);var k=dd.toISOString().slice(0,10),isToday=k===today,isDone=h.days&&h.days[k];return'<div class="check-day'+(isDone?' done':'')+(isToday?' today':'')+'">'+w+'</div>'}).join('');list.innerHTML+='<div class="habit-card"><div class="habit-header"><span class="habit-name">'+h.name+'</span><span class="habit-streak">🔥 连续'+streak+'天</span></div><div class="check-row">'+weekHtml+'</div><button class="check-btn '+(doneToday?'done':'active')+'" onclick="toggleDay('+h.id+')">'+(doneToday?'✅ 今日已打卡':'打卡')+'</button><div style="text-align:right;margin-top:8px"><span style="font-size:12px;color:#ccc;cursor:pointer" onclick="delHabit('+h.id+')">删除</span></div></div>'})}
+function render(){const list=document.getElementById('list');list.innerHTML='';if(!habits.length){list.innerHTML='<div style="text-align:center;padding:60px;color:#999"><div style="font-size:32px;margin-bottom:12px">HABIT</div><p>?????????????</p></div>';return}
+habits.forEach(function(h){var streak=getStreak(h),doneToday=h.days&&h.days[today],weekDays=['?','?','?','?','?','?','?'],d=new Date(),dayOfWeek=d.getDay(),weekHtml=weekDays.map(function(w,i){var dd=new Date(d);dd.setDate(dd.getDate()-(dayOfWeek===0?6:dayOfWeek-1)+i);var k=dd.toISOString().slice(0,10),isToday=k===today,isDone=h.days&&h.days[k];return'<div class="check-day'+(isDone?' done':'')+(isToday?' today':'')+'">'+w+'</div>'}).join('');list.innerHTML+='<div class="habit-card"><div class="habit-header"><span class="habit-name">'+h.name+'</span><span class="habit-streak">??'+streak+'?</span></div><div class="check-row">'+weekHtml+'</div><button class="check-btn '+(doneToday?'done':'active')+'" onclick="toggleDay('+h.id+')">'+(doneToday?'?????':'??')+'</button><div style="text-align:right;margin-top:8px"><span style="font-size:12px;color:#ccc;cursor:pointer" onclick="delHabit('+h.id+')">??</span></div></div>'})}
 render();
 </script>
 </body>
 </html>
 """.trimIndent()
 
-// ═══════════════════════════════════════════════════════════════════════
-// HTML 模板：通用工具
-// ═══════════════════════════════════════════════════════════════════════
+// ???????????????????????????????????????????????????????????????????????
+// HTML ???????
+// ???????????????????????????????????????????????????????????????????????
 private val genericHtml = """
 <!DOCTYPE html>
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
-<title>轻量工具</title>
+<title>????</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,sans-serif;background:linear-gradient(135deg,#a8edea 0%,#fed6e3 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -606,14 +873,14 @@ p{color:#666;font-size:14px;line-height:1.6;margin-bottom:24px}
 </head>
 <body>
 <div class="card">
-<div class="icon">✨</div>
-<h1>蓝心快搭</h1>
-<p>这是一个由AI生成的轻量工具。你可以通过对话告诉蓝心快搭你的具体需求，生成更贴合的应用。</p>
+<div class="icon">AI</div>
+<h1>????</h1>
+<p>?????AI?????????????????????????????????????</p>
 <div class="counter" id="count">0</div>
-<button class="btn" onclick="document.getElementById('count').textContent=parseInt(document.getElementById('count').textContent)+1">点击计数</button>
-<button class="btn" style="background:#f0f0f0;color:#666" onclick="document.getElementById('count').textContent=0">重置</button>
+<button class="btn" onclick="document.getElementById('count').textContent=parseInt(document.getElementById('count').textContent)+1">????</button>
+<button class="btn" style="background:#f0f0f0;color:#666" onclick="document.getElementById('count').textContent=0">??</button>
 <div class="note">
-<textarea placeholder="在这里记录你的想法..."></textarea>
+<textarea placeholder="?????????..."></textarea>
 </div>
 </div>
 </body>
